@@ -23,11 +23,14 @@ public:
 private slots:
     void changCurrentToolSlot();
     void scaleSceneSlot();
-    void lineColorButtonSlot();
+    void ColorButtonSlot();
+    void settingsComboBoxSlot(int index);
 private:
     Ui::Widget*  ui;
     QToolButton* currentTool;
     MapScene*    mapScene;
     int          mapSizeValue;
+
+    void settingsInit();
 };
 #endif // WIDGET_H

@@ -7,6 +7,7 @@
 #include <QAbstractItemView>
 #include <QListView>
 #include <QStyledItemDelegate>
+#include <QDebug>
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -40,7 +41,8 @@ Widget::Widget(QWidget *parent)
     mapSizeValue = 100;
     connect(ui->plusButton,&QPushButton::clicked,this,&Widget::scaleSceneSlot);
     connect(ui->minusButton,&QPushButton::clicked,this,&Widget::scaleSceneSlot);
-    connect(ui->lineColorButton, &QPushButton::clicked, this,&Widget::lineColorButtonSlot);
+    connect(ui->KPColorButton, &QPushButton::clicked, this,&Widget::ColorButtonSlot);
+    connect(ui->KPNumColorButton, &QPushButton::clicked, this,&Widget::ColorButtonSlot);
 
 
     QListView* listview = new QListView;
@@ -48,9 +50,15 @@ Widget::Widget(QWidget *parent)
     font.setFamily("Comfortaa");
     font.setPointSize(10);
     listview->setFont(font);
-    ui->comboBox->setView(listview);
+    ui->SettingsComboBox->setView(listview);
 
     ui->moveButton->click();
+
+    connect(ui->SettingsComboBox, &QComboBox::currentIndexChanged, this, &Widget::settingsComboBoxSlot);
+
+    settingsComboBoxSlot(0);
+
+    settingsInit();
 }
 
 Widget::~Widget()
@@ -119,9 +127,77 @@ void Widget::scaleSceneSlot()
     ui->mapView->setTransform(matrix);
 }
 
-void Widget::lineColorButtonSlot()
+void Widget::ColorButtonSlot()
 {
-    QColorDialog dlg(this);
-    dlg.setStyleSheet("background:#555");
-    QColor color = dlg.getColor(Qt::white, this,"Select");
+    QColor oldColor(sender()->property("ColorName").toString());
+    QColor newColor = QColorDialog::getColor(oldColor, this, "Выбор цвета");
+    if(!newColor.isValid()) return;
+    QString name = sender()->objectName();
+    if(name == "KPNumColorButton"){
+        mapScene->setKPNumColor(newColor);
+        ui->KPNumColorButton->setProperty("ColorName", newColor.name());
+        ui->KPNumColorButton->setStyleSheet("background:" + newColor.name());
+    }else if(name == "KPColorButton"){
+        mapScene->setKPColor(newColor);
+        ui->KPColorButton->setProperty("ColorName", newColor.name());
+        ui->KPColorButton->setStyleSheet("background:" + newColor.name());
+    }
+}
+
+void Widget::settingsComboBoxSlot(int index)
+{
+    QList<QWidget*> widgets = ui->tab->findChildren<QWidget*>(Qt::FindDirectChildrenOnly);
+    for(QWidget* w: widgets){
+        if(index == 1){
+            w->setEnabled(true);
+        }else if(index == 0){
+            QString name = w->objectName();
+            if(name == "SettingsComboBox" || name.indexOf("Cursor") != -1){
+                continue;
+            }
+            w->setEnabled(false);
+        }
+    }
+}
+
+void Widget::settingsInit()
+{
+    //Номера КП
+    ui->KPNumSpinBox->setValue(30);
+    mapScene->setKPNumSize(30);
+
+    ui->KPNumStyleComboBox->setCurrentIndex(0);
+    mapScene->setKPNumStyle(0);
+
+    ui->KPNumColorButton->setProperty("ColorName", "#ff0000");
+    ui->KPNumColorButton->setStyleSheet("background: #ff0000");
+    mapScene->setKPNumColor(Qt::red);
+    //КП
+    ui->KPSizeSpinBox->setValue(40);
+    mapScene->setKPSize(40);
+
+    ui->KPWidthSpinBox->setValue(3);
+    mapScene->setKPWidth(3);
+
+    ui->KPColorButton->setProperty("ColorName", "#ff0000");
+    ui->KPColorButton->setStyleSheet("background: #ff0000");
+    mapScene->setKPColor(Qt::red);
+    //Старт/Финиш
+    ui->StartSizeSpinBox->setValue(40);
+    mapScene->setStartSize(40);
+
+    ui->StartWidthSpinBox->setValue(3);
+    mapScene->setStartWidth(3);
+
+    ui->StartColorButton->setProperty("ColorName", "#ff0000");
+    ui->StartColorButton->setStyleSheet("background: #ff0000");
+    mapScene->setStartColor(Qt::red);
+    //Линии
+    ui->LineWidthSpinBox->setValue(3);
+    mapScene->setLineWidth(3);
+
+    ui->LineColorButton->setProperty("ColorName", "#ff0000");
+    ui->LineColorButton->setStyleSheet("background: #ff0000");
+    mapScene->setLineColor(Qt::red);
+
 }
