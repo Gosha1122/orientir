@@ -11,6 +11,7 @@ CONFIG += c++17
 SOURCES += \
     main.cpp \
     mapcontrolpoint.cpp \
+    mapiconbutton.cpp \
     mapitem.cpp \
     mapscene.cpp \
     mapview.cpp \
@@ -20,6 +21,7 @@ SOURCES += \
 HEADERS += \
     defines.h \
     mapcontrolpoint.h \
+    mapiconbutton.h \
     mapitem.h \
     mapscene.h \
     mapview.h \
@@ -27,6 +29,7 @@ HEADERS += \
     widget.h
 
 FORMS += \
+    mapiconbutton.ui \
     widget.ui
 
 # Default rules for deployment.

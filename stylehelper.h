@@ -17,6 +17,8 @@ public:
     void static setFonts();
     QString static getMapStyleDark();
     void static setToolButtonStyleDark(QToolButton* btn, MapIconsType type, bool active=false);
+    QString static getEndPathButtonStyle();
+    QString static getMapIconButtonStyle();
 private:
     QString static darkBgTop;
     QString static darkBgRight;

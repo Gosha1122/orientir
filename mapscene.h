@@ -3,6 +3,7 @@
 
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
+class MapControlPoint;
 
 class MapScene : public QGraphicsScene
 {
@@ -41,7 +42,13 @@ public:
     void setLineWidth(int newLineWidth);
 
     void setLineColor(const QColor &newLineColor);
-
+    int getPointCount() const;
+    void deletePoints();
+    QGraphicsItem *getMapItem() const;
+    void setMapItem(QGraphicsItem *newMapItem);
+    void setFinishPoint();
+signals:
+    void addStartPointSignal();
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
@@ -68,6 +75,10 @@ protected:
     //Линии
     int    LineWidth;
     QColor LineColor;
+
+    int pointCount = 0;
+    QGraphicsItem* mapItem;
+    MapControlPoint * lastItem;
 
 
 };

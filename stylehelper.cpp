@@ -167,3 +167,33 @@ void StyleHelper::setToolButtonStyleDark(QToolButton* btn, MapIconsType type, bo
 
 }
 
+QString StyleHelper::getEndPathButtonStyle()
+{
+    return "QPushButton{"
+           "border:none;"
+           "border-radius:5px;"
+           "background:#2B3035;"
+           "color:#fff;"
+           "}"
+           "QPushButton::hover{"
+           "background:#3B4045;"
+           "}"
+           "QPushButton::pressed{"
+           "background:#1B2025;"
+           "}";
+}
+
+QString StyleHelper::getMapIconButtonStyle()
+{
+    return "QFrame{"
+           "background:#ddd;"
+           "border:2px solid #ddd;"
+           "}"
+           "QFrame::hover{"
+           "border-color:rgb(120,150,230);"
+           "}"
+           "QLabel{"
+           "border:none;"
+           "}";
+}
+

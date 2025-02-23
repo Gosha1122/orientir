@@ -8,6 +8,8 @@
 #include <QListView>
 #include <QStyledItemDelegate>
 #include <QDebug>
+#include <QPushButton>
+#include "mapiconbutton.h"
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -37,6 +39,7 @@ Widget::Widget(QWidget *parent)
     QGraphicsPixmapItem* imageItem = new QGraphicsPixmapItem(pix);
 
     ui->mapView->setSceneRect(0,0,pix.width(), pix.height());
+    mapScene->setMapItem(imageItem);
     mapScene->addItem(imageItem);
     mapSizeValue = 100;
     connect(ui->plusButton,&QPushButton::clicked,this,&Widget::scaleSceneSlot);
@@ -59,6 +62,22 @@ Widget::Widget(QWidget *parent)
     settingsComboBoxSlot(0);
 
     settingsInit();
+
+    endPathButton = new QPushButton("slkajdfkj",this);
+    endPathButton->move(10,ui->topPanelWidget->height()+10);
+    endPathButton->setStyleSheet(StyleHelper::getEndPathButtonStyle());
+    endPathButton->hide();
+    connect(mapScene, &MapScene::addStartPointSignal,
+            this, &Widget::addStartPointSlot);
+    connect(endPathButton, &QPushButton::clicked,
+            this, &Widget::endPathSlot);
+    connect(ui->backButton, &QToolButton::clicked,
+            this, &Widget::backButtonSlot);
+
+
+    MapIconButton* iconBtn =
+        new MapIconButton(ui->mapsListPage);
+    iconBtn->setStyleSheet(StyleHelper::getMapIconButtonStyle());
 }
 
 Widget::~Widget()
@@ -158,6 +177,25 @@ void Widget::settingsComboBoxSlot(int index)
             w->setEnabled(false);
         }
     }
+}
+
+void Widget::addStartPointSlot()
+{
+    endPathButton->show();
+}
+
+void Widget::endPathSlot()
+{
+    if(mapScene->getPointCount() == 1){
+        mapScene->deletePoints();
+    }else{
+        mapScene->setFinishPoint();
+    }
+}
+
+void Widget::backButtonSlot()
+{
+   ui->stackedWidget->setCurrentWidget(ui->mapsListPage);
 }
 
 void Widget::settingsInit()

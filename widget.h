@@ -11,6 +11,7 @@ namespace Ui {
 class Widget;
 }
 class QToolButton;
+class QPushButton;
 QT_END_NAMESPACE
 
 class Widget : public QWidget
@@ -25,11 +26,16 @@ private slots:
     void scaleSceneSlot();
     void ColorButtonSlot();
     void settingsComboBoxSlot(int index);
+    void addStartPointSlot();
+    void endPathSlot();
+    void backButtonSlot();
 private:
     Ui::Widget*  ui;
     QToolButton* currentTool;
     MapScene*    mapScene;
     int          mapSizeValue;
+    QPushButton* endPathButton;
+
 
     void settingsInit();
 };
