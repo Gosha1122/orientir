@@ -5,7 +5,10 @@
 #include <QObject>
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
+#include <QDebug>
+#include <QGraphicsSceneContextMenuEvent>
 
+class MapScene;
 
 class MapControlPoint :public QObject, public QGraphicsItem
 {
@@ -21,9 +24,17 @@ public:
     void setSettings(QColor textColor, QColor penColor, int textSize, int KPSize, int penWidth, int textStyle,
                      int StartSize, int  StartWidth, QColor StartColor, int LineWidth, QColor LineColor);
 
+    MapControlPoint *getPrevPoint() const;
+    void setPrevPoint(MapControlPoint *newPrevPoint);
+
+    void setParentScene(MapScene *newParentScene);
+
 protected:
     QRectF boundingRect() const override;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+signals:
+    void removeMapPoint(MapControlPoint* point);
 private:
     Shape shape;
 
@@ -40,6 +51,12 @@ private:
     int    StartWidth;
     int    LineWidth;
 
+    MapControlPoint* prevPoint;
+    MapScene* parentScene;
+
+
 };
+
+
 
 #endif // MAPCONTROLPOINT_H

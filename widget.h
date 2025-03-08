@@ -29,6 +29,8 @@ private slots:
     void addStartPointSlot();
     void endPathSlot();
     void backButtonSlot();
+    void endButtonPointSlot();
+    void openMapSlot();
 private:
     Ui::Widget*  ui;
     QToolButton* currentTool;

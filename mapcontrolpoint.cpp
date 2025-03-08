@@ -1,7 +1,10 @@
 #include "mapcontrolpoint.h"
+#include <QDebug>
+#include <QMenu>
+#include "mapscene.h"
 
 MapControlPoint::MapControlPoint(QObject *parent)
-    :QObject(parent), QGraphicsItem(nullptr)
+    :QObject(parent), QGraphicsItem(nullptr), prevPoint(nullptr)
 {
 
 }
@@ -26,14 +29,20 @@ void MapControlPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
         pen.setWidth(StartWidth);
         painter->setPen(pen);
 
-        QPoint points[3]={{-StartSize / 2, StartSize / 2},{0,-StartSize / 2},{StartSize / 2, StartSize / 2}};
+        QPoint points[3]={{-StartSize / 2, StartSize / 3},
+                            {0,-StartSize / 2},
+                            {StartSize / 2, StartSize / 3}};
         painter->drawPolygon(points, 3);
+        painter->setBrush(penColor);
+        painter->drawEllipse(-2, -2, 4, 4);
     }else if(shape==KP){
         QPen pen(penColor);
         pen.setWidth(penWidth);
         painter->setPen(pen);
 
         painter->drawEllipse(-KPSize / 2, -KPSize / 2, KPSize, KPSize);
+        painter->setBrush(penColor);
+        painter->drawEllipse(-2, -2, 4, 4);
     }else if(shape==Finish){
         QPen pen(StartColor);
         pen.setWidth(StartWidth);
@@ -41,7 +50,39 @@ void MapControlPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
 
         painter->drawEllipse(-StartSize / 2, -StartSize / 2, StartSize, StartSize);
         painter->drawEllipse(-StartSize / 3, -StartSize / 3, StartSize * 2 / 3, StartSize * 2 / 3);
+        painter->setBrush(penColor);
+        painter->drawEllipse(-2, -2, 4, 4);
     }
+}
+
+void MapControlPoint::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+{
+    parentScene->itemContextMenuFlag = true;
+    QMenu menu;
+    QAction* deleteAction = menu.addAction("Удалить");
+    QAction* moveAction = menu.addAction("Переместить");
+    QAction *selectedAction = menu.exec(event->screenPos());
+    if (selectedAction == deleteAction ) {
+        emit removeMapPoint(this);
+    } else if (selectedAction == moveAction ) {
+        //...
+    }
+
+}
+
+void MapControlPoint::setParentScene(MapScene *newParentScene)
+{
+    parentScene = newParentScene;
+}
+
+MapControlPoint *MapControlPoint::getPrevPoint() const
+{
+    return prevPoint;
+}
+
+void MapControlPoint::setPrevPoint(MapControlPoint *newPrevPoint)
+{
+    prevPoint = newPrevPoint;
 }
 
 void MapControlPoint::setShape(Shape newShape)
@@ -64,3 +105,5 @@ void MapControlPoint::setSettings(QColor textColor, QColor penColor, int textSiz
     this->LineWidth  = LineWidth ;
     this->LineColor  = LineColor ;
 }
+
+

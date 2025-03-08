@@ -46,7 +46,8 @@ Widget::Widget(QWidget *parent)
     connect(ui->minusButton,&QPushButton::clicked,this,&Widget::scaleSceneSlot);
     connect(ui->KPColorButton, &QPushButton::clicked, this,&Widget::ColorButtonSlot);
     connect(ui->KPNumColorButton, &QPushButton::clicked, this,&Widget::ColorButtonSlot);
-
+    connect(mapScene, &MapScene::zoomSignal, ui->plusButton,&QPushButton::click);
+    connect(mapScene, &MapScene::unzoomSignal, ui->minusButton,&QPushButton::click);
 
     QListView* listview = new QListView;
     QFont font = listview->font();
@@ -63,10 +64,13 @@ Widget::Widget(QWidget *parent)
 
     settingsInit();
 
-    endPathButton = new QPushButton("slkajdfkj",this);
+    endPathButton = new QPushButton("Завершить",this);
     endPathButton->move(10,ui->topPanelWidget->height()+10);
     endPathButton->setStyleSheet(StyleHelper::getEndPathButtonStyle());
     endPathButton->hide();
+    connect(mapScene, &MapScene::removeAllMapPointsSignal, endPathButton, &QWidget::hide);
+    connect(endPathButton, &QPushButton::clicked, this, &Widget::endButtonPointSlot);
+
     connect(mapScene, &MapScene::addStartPointSignal,
             this, &Widget::addStartPointSlot);
     connect(endPathButton, &QPushButton::clicked,
@@ -78,6 +82,15 @@ Widget::Widget(QWidget *parent)
     MapIconButton* iconBtn =
         new MapIconButton(ui->mapsListPage);
     iconBtn->setStyleSheet(StyleHelper::getMapIconButtonStyle());
+
+    connect(iconBtn, &MapIconButton::openMap, this, &Widget::openMapSlot);
+
+    ui->KPNumSpinBox->setStyleSheet(StyleHelper::getSpinBoxStyle());
+    ui->KPSizeSpinBox->setStyleSheet(StyleHelper::getSpinBoxStyle());
+    ui->KPWidthSpinBox->setStyleSheet(StyleHelper::getSpinBoxStyle());
+    ui->StartSizeSpinBox->setStyleSheet(StyleHelper::getSpinBoxStyle());
+    ui->StartWidthSpinBox->setStyleSheet(StyleHelper::getSpinBoxStyle());
+    ui->LineWidthSpinBox->setStyleSheet(StyleHelper::getSpinBoxStyle());
 }
 
 Widget::~Widget()
@@ -195,7 +208,19 @@ void Widget::endPathSlot()
 
 void Widget::backButtonSlot()
 {
+   endPathButton->hide();
    ui->stackedWidget->setCurrentWidget(ui->mapsListPage);
+}
+
+void Widget::endButtonPointSlot()
+{
+    endPathButton->hide();
+    mapScene->setFinishPointFlag(true);
+}
+
+void Widget::openMapSlot()
+{
+    ui->stackedWidget->setCurrentWidget(ui->mapPage);
 }
 
 void Widget::settingsInit()

@@ -1,6 +1,7 @@
 #include "mapscene.h"
 #include <QDebug>
 #include "mapcontrolpoint.h"
+#include <QMenu>
 MapScene::MapScene(QObject *parent)
     : QGraphicsScene{parent}
 {}
@@ -9,10 +10,11 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if(event->button()==Qt::LeftButton){
         if(currentToolType==ToolType::Path){
-            if(!startPoint && !finishPoint){
+            MapControlPoint* point = new MapControlPoint;
+            if(!startPointFlag && !finishPointFlag){
                 qDebug() << "Start";
-                startPoint = true;
-                MapControlPoint* point = new MapControlPoint;
+                startPointFlag = true;
+
                 point->setShape(MapControlPoint::Start);
                 point->setSettings(KPNumColor, KPColor, KPNumSize, KPSize, KPWidth, KPNumStyle, StartSize,
                                    StartWidth, StartColor, LineWidth, LineColor);
@@ -21,12 +23,12 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
                 lastItem = point;
                 emit addStartPointSignal();
                 pointCount ++;
-            }else if(startPoint && !finishPoint){
-                MapControlPoint* point = new MapControlPoint;
+            }else if(startPointFlag && !finishPointFlag){
                 point->setSettings(KPNumColor, KPColor, KPNumSize, KPSize, KPWidth, KPNumStyle, StartSize,
                                    StartWidth, StartColor, LineWidth, LineColor);
                 point->setShape(MapControlPoint::KP);
                 point->setPos(event->scenePos());
+                point->setPrevPoint(lastItem);
                 addItem(point);
                 lastItem = point;
                 qDebug() << "Kp";
@@ -34,6 +36,9 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
             }else{
                 qDebug() << "??";
             }
+            point->setParentScene(this);
+            connect(point, &MapControlPoint::removeMapPoint,
+                    this, &MapScene::removeMapPointSlot);
         }
     }
     QGraphicsScene::mousePressEvent(event);
@@ -51,21 +56,51 @@ void MapScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void MapScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(event->button()==Qt::LeftButton){
-        if(currentToolType==ToolType::Path){
-            if(startPoint && !finishPoint){
-                qDebug() << "Finish";
-                finishPoint = true;
-                MapControlPoint* point = new MapControlPoint;
-                point->setSettings(KPNumColor, KPColor, KPNumSize, KPSize, KPWidth, KPNumStyle, StartSize,
-                                   StartWidth, StartColor, LineWidth, LineColor);
-                point->setShape(MapControlPoint::Finish);
-                point->setPos(event->scenePos());
-                addItem(point);
-            }
-        }
-    }
+    // if(event->button()==Qt::LeftButton){
+    //     if(currentToolType==ToolType::Path){
+    //         if(startPoint && !finishPoint){
+    //             qDebug() << "Finish";
+    //             finishPoint = true;
+    //             MapControlPoint* point = new MapControlPoint;
+    //             point->setSettings(KPNumColor, KPColor, KPNumSize, KPSize, KPWidth, KPNumStyle, StartSize,
+    //                                StartWidth, StartColor, LineWidth, LineColor);
+    //             point->setShape(MapControlPoint::Finish);
+    //             point->setPos(event->scenePos());
+    //             addItem(point);
+    //         }
+    //     }
+    // }
     QGraphicsScene::mouseDoubleClickEvent(event);
+}
+
+void MapScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+{
+    QGraphicsScene::contextMenuEvent(event);
+    if(itemContextMenuFlag){
+        itemContextMenuFlag = false;
+        return;
+    }
+    QMenu menu;
+    QAction* clearAction = menu.addAction("Очистить");
+    QAction* zoomAction = menu.addAction("Увеличить");
+    QAction* unzoomAction = menu.addAction("Уменьшить");
+    if(pointCount == 0){
+        clearAction->setEnabled(false);
+    }
+    QAction *selectedAction = menu.exec(event->screenPos());
+    if (selectedAction == clearAction ) {
+        deletePoints();
+    } else if (selectedAction == zoomAction ) {
+        emit zoomSignal();
+    }else if (selectedAction == unzoomAction ) {
+        emit unzoomSignal();
+    }
+
+}
+
+void MapScene::setFinishPointFlag(bool newFinishPointFlag)
+{
+    finishPointFlag = newFinishPointFlag;
 }
 
 QGraphicsItem *MapScene::getMapItem() const
@@ -84,6 +119,24 @@ void MapScene::setFinishPoint()
     lastItem->update();
 }
 
+void MapScene::removeMapPointSlot(MapControlPoint *point)
+{
+    QList<QGraphicsItem *> lst = this->items();
+    for(int i=lst.size()-1;i>=0;i--){
+        if(lst[i]==mapItem)
+            continue;
+        MapControlPoint* mp = qgraphicsitem_cast<MapControlPoint*>(lst[i]);
+        if(mp->getPrevPoint()==point){
+            mp->setPrevPoint(point->getPrevPoint());
+        }
+    }
+    if(point==lastItem){
+        lastItem= point->getPrevPoint();
+    }
+    removeItem(point);
+
+}
+
 int MapScene::getPointCount() const
 {
     return pointCount;
@@ -98,8 +151,9 @@ void MapScene::deletePoints()
         this->removeItem(lst[i]);
     }
     pointCount = 0;
-    startPoint = false;
-    finishPoint = false;
+    startPointFlag = false;
+    finishPointFlag = false;
+    emit removeAllMapPointsSignal();
 }
 
 void MapScene::setLineColor(const QColor &newLineColor)

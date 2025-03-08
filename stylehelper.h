@@ -19,6 +19,7 @@ public:
     void static setToolButtonStyleDark(QToolButton* btn, MapIconsType type, bool active=false);
     QString static getEndPathButtonStyle();
     QString static getMapIconButtonStyle();
+    QString static getSpinBoxStyle();
 private:
     QString static darkBgTop;
     QString static darkBgRight;
