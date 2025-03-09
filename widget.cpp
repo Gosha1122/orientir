@@ -91,6 +91,13 @@ Widget::Widget(QWidget *parent)
     ui->StartSizeSpinBox->setStyleSheet(StyleHelper::getSpinBoxStyle());
     ui->StartWidthSpinBox->setStyleSheet(StyleHelper::getSpinBoxStyle());
     ui->LineWidthSpinBox->setStyleSheet(StyleHelper::getSpinBoxStyle());
+
+    connect(ui->KPNumSpinBox, &QSpinBox::valueChanged, this, &Widget::SizeSpinBoxSlot);
+    connect(ui->KPSizeSpinBox, &QSpinBox::valueChanged, this, &Widget::SizeSpinBoxSlot);
+    connect(ui->StartSizeSpinBox, &QSpinBox::valueChanged, this, &Widget::SizeSpinBoxSlot);
+    connect(ui->KPWidthSpinBox, &QSpinBox::valueChanged, this, &Widget::SizeSpinBoxSlot);
+    connect(ui->StartWidthSpinBox, &QSpinBox::valueChanged, this, &Widget::SizeSpinBoxSlot);
+    connect(ui->LineWidthSpinBox, &QSpinBox::valueChanged, this, &Widget::SizeSpinBoxSlot);
 }
 
 Widget::~Widget()
@@ -221,6 +228,31 @@ void Widget::endButtonPointSlot()
 void Widget::openMapSlot()
 {
     ui->stackedWidget->setCurrentWidget(ui->mapPage);
+}
+
+void Widget::SizeSpinBoxSlot(int value)
+{
+    qDebug() << "SpinBox";
+    QString name = sender()->objectName();
+    if(name == "KPNumSpinBox"){
+        ui->KPNumSpinBox->setValue(value);
+        mapScene->setKPNumSize(value);
+    }else if(name == "KPSizeSpinBox"){
+        ui->KPSizeSpinBox->setValue(value);
+        mapScene->setKPSize(value);
+    }else if(name == "StartSizeSpinBox"){
+        ui->StartSizeSpinBox->setValue(value);
+        mapScene->setStartSize(value);
+    }else if(name == "KPWidthSpinBox"){
+        ui->KPWidthSpinBox->setValue(value);
+        mapScene->setKPWidth(value);
+    }else if(name == "StartWidthSpinBox"){
+        ui->StartWidthSpinBox->setValue(value);
+        mapScene->setStartWidth(value);
+    }else if(name == "LineWidthSpinBox"){
+        ui->LineWidthSpinBox->setValue(value);
+        mapScene->setLineWidth(value);
+    }
 }
 
 void Widget::settingsInit()

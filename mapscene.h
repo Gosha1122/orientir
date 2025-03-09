@@ -98,7 +98,9 @@ protected:
     MapControlPoint * lastItem;
     PoliLine* poliline;
 
+    QPointF oldPoint;
 
+    bool flagLastItemStart = false;
 
 };
 

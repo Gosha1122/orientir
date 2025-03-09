@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QMenu>
 #include "mapscene.h"
+#include "maplinekp.h"
 
 MapControlPoint::MapControlPoint(QObject *parent)
     :QObject(parent), QGraphicsItem(nullptr), prevPoint(nullptr)
@@ -77,7 +78,6 @@ void MapControlPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
             leftButtonPresed = true;
             setPreviousPosition(event->scenePos());
             setFlag(ItemIsMovable);
-
         }
     }
     QGraphicsItem::mousePressEvent(event);
@@ -88,11 +88,23 @@ void MapControlPoint::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     if(leftButtonPresed){
         auto dx =  event->scenePos().x()- previousPosition.x();
         auto dy = event->scenePos().y() - previousPosition.y();
-        QPointF oldPos = this->pos();
+        QPointF oldPos = this->scenePos();
         moveBy(dx, dy);
-        QPointF newPos = this->pos();
+        //QPointF newPos = this->scenePos();
+        /*
         setPreviousPosition(event->scenePos());
-        emit moveMapPoint(oldPos, newPos);
+        if(dx > 0.5 || dy > 0.5){
+            emit moveMapPoint(oldPos, newPos);
+        }
+        */
+        if(startLine != nullptr){
+            startLine->setRKP(KPSize / 2);
+            startLine->setKPLine(startLine->getStartPoint().x(), startLine->getStartPoint().y(), oldPos.x(), oldPos.y());
+        }
+        if(finishLine != nullptr){
+            finishLine->setRKP(KPSize / 2);
+            finishLine->setKPLine(oldPos.x(), oldPos.y(), finishLine->getFinishPoint().x(), finishLine->getFinishPoint().y());
+        }
     }
     QGraphicsItem::mouseMoveEvent(event);
 }
@@ -101,9 +113,34 @@ void MapControlPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if(event->button()==Qt::LeftButton){
         leftButtonPresed = false;
-
+        if(startLine != nullptr){
+            startLine->setKPLine(startLine->getStartPoint().x(), startLine->getStartPoint().y(), this->scenePos().x(), this->scenePos().y());
+        }
+        if(finishLine != nullptr){
+            finishLine->setKPLine(this->scenePos().x(), this->scenePos().y(), finishLine->getFinishPoint().x(), finishLine->getFinishPoint().y());
+        }
     }
     QGraphicsItem::mouseReleaseEvent(event);
+}
+
+MapLineKP *MapControlPoint::getFinishLine() const
+{
+    return finishLine;
+}
+
+void MapControlPoint::setFinishLine(MapLineKP *newFinishLine)
+{
+    finishLine = newFinishLine;
+}
+
+MapLineKP *MapControlPoint::getStartLine() const
+{
+    return startLine;
+}
+
+void MapControlPoint::setStartLine(MapLineKP *newStartLine)
+{
+    startLine = newStartLine;
 }
 
 void MapControlPoint::setParentScene(MapScene *newParentScene)

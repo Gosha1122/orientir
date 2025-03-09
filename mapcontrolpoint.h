@@ -10,6 +10,7 @@
 #include <QGraphicsSceneMouseEvent>
 
 class MapScene;
+class MapLineKP;
 
 class MapControlPoint :public QObject, public QGraphicsItem
 {
@@ -30,6 +31,12 @@ public:
 
     void setParentScene(MapScene *newParentScene);
     void setPreviousPosition(QPointF pos);
+
+    MapLineKP *getStartLine() const;
+    void setStartLine(MapLineKP *newStartLine);
+
+    MapLineKP *getFinishLine() const;
+    void setFinishLine(MapLineKP *newFinishLine);
 
 protected:
     QRectF boundingRect() const override;
@@ -62,7 +69,8 @@ private:
     QPointF previousPosition;
     bool leftButtonPresed = false;
 
-
+    MapLineKP* startLine = nullptr;
+    MapLineKP* finishLine = nullptr;
 
 };
 
