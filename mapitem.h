@@ -7,6 +7,7 @@ class MapItem : public QWidget
 public:
     explicit MapItem(QWidget *parent = nullptr);
 
+
 signals:
 };
 

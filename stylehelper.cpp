@@ -197,3 +197,19 @@ QString StyleHelper::getMapIconButtonStyle()
            "}";
 }
 
+QString StyleHelper::getSpinBoxStyle()
+{
+    return "QSpinBox{"
+           "background-color: #6a777f;"
+           "border: none;"
+           "border-radius:5px;"
+           "padding: 5px;"
+           "}"
+           "QSpinBox::up-button{"
+           "image: url(:/resourses/icons/up-arrow-10.png);"
+           "}"
+           "QSpinBox::down-button{"
+           "image: url(:/resourses/icons/down-arrow-10.png);"
+           "}";
+}
+

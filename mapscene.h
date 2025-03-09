@@ -3,6 +3,7 @@
 
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsSceneContextMenuEvent>
 class MapControlPoint;
 
 class MapScene : public QGraphicsScene
@@ -47,17 +48,27 @@ public:
     QGraphicsItem *getMapItem() const;
     void setMapItem(QGraphicsItem *newMapItem);
     void setFinishPoint();
+
+    bool itemContextMenuFlag = false;
+    void setFinishPointFlag(bool newFinishPointFlag);
+
+private slots:
+    void removeMapPointSlot(MapControlPoint* point);
 signals:
     void addStartPointSignal();
+    void zoomSignal();
+    void unzoomSignal();
+    void removeAllMapPointsSignal();
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override;
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
 
     ToolType currentToolType;
-    bool startPoint = false;
-    bool finishPoint = false;
+    bool startPointFlag = false;
+    bool finishPointFlag = false;
 
     //Settings
     //Номера КП
@@ -79,6 +90,7 @@ protected:
     int pointCount = 0;
     QGraphicsItem* mapItem;
     MapControlPoint * lastItem;
+
 
 
 };
