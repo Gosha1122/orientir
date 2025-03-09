@@ -7,6 +7,7 @@
 #include <QStyleOptionGraphicsItem>
 #include <QDebug>
 #include <QGraphicsSceneContextMenuEvent>
+#include <QGraphicsSceneMouseEvent>
 
 class MapScene;
 
@@ -28,13 +29,18 @@ public:
     void setPrevPoint(MapControlPoint *newPrevPoint);
 
     void setParentScene(MapScene *newParentScene);
+    void setPreviousPosition(QPointF pos);
 
 protected:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 signals:
     void removeMapPoint(MapControlPoint* point);
+    void moveMapPoint(QPointF oldPos, QPointF newPos);
 private:
     Shape shape;
 
@@ -53,6 +59,9 @@ private:
 
     MapControlPoint* prevPoint;
     MapScene* parentScene;
+    QPointF previousPosition;
+    bool leftButtonPresed = false;
+
 
 
 };

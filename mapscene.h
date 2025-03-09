@@ -5,6 +5,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneContextMenuEvent>
 class MapControlPoint;
+class PoliLine;
 
 class MapScene : public QGraphicsScene
 {
@@ -52,8 +53,13 @@ public:
     bool itemContextMenuFlag = false;
     void setFinishPointFlag(bool newFinishPointFlag);
 
+
+
+    bool getFinishPointFlag() const;
+
 private slots:
     void removeMapPointSlot(MapControlPoint* point);
+    void moveMapPoitSlot(QPointF oldPos, QPointF newPos);
 signals:
     void addStartPointSignal();
     void zoomSignal();
@@ -90,6 +96,7 @@ protected:
     int pointCount = 0;
     QGraphicsItem* mapItem;
     MapControlPoint * lastItem;
+    PoliLine* poliline;
 
 
 

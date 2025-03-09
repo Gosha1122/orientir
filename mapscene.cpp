@@ -1,10 +1,13 @@
 #include "mapscene.h"
 #include <QDebug>
 #include "mapcontrolpoint.h"
+#include "poliline.h"
 #include <QMenu>
 MapScene::MapScene(QObject *parent)
     : QGraphicsScene{parent}
-{}
+{
+
+}
 
 void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
@@ -21,6 +24,11 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
                 point->setPos(event->scenePos());
                 addItem(point);
                 lastItem = point;
+                poliline = new PoliLine;
+                QPainterPath path;
+                path.moveTo(event->scenePos());
+                poliline->setPath(path);
+                addItem(poliline);
                 emit addStartPointSignal();
                 pointCount ++;
             }else if(startPointFlag && !finishPointFlag){
@@ -33,12 +41,19 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
                 lastItem = point;
                 qDebug() << "Kp";
                 pointCount ++;
+
+                QPainterPath path = poliline->path();
+                path.lineTo(event->scenePos());
+                poliline->setPath(path);
+
             }else{
                 qDebug() << "??";
             }
             point->setParentScene(this);
             connect(point, &MapControlPoint::removeMapPoint,
                     this, &MapScene::removeMapPointSlot);
+            connect(point, &MapControlPoint::moveMapPoint,
+                    this, &MapScene::moveMapPoitSlot);
         }
     }
     QGraphicsScene::mousePressEvent(event);
@@ -98,6 +113,11 @@ void MapScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 
 }
 
+bool MapScene::getFinishPointFlag() const
+{
+    return finishPointFlag;
+}
+
 void MapScene::setFinishPointFlag(bool newFinishPointFlag)
 {
     finishPointFlag = newFinishPointFlag;
@@ -135,6 +155,19 @@ void MapScene::removeMapPointSlot(MapControlPoint *point)
     }
     removeItem(point);
 
+}
+
+void MapScene::moveMapPoitSlot(QPointF oldPos, QPointF newPos)
+{
+    QPainterPath path = poliline->path();
+    QPainterPath newPath;
+    for(int i=0;i<path.elementCount();i++){
+        if(path.elementAt(i).x == oldPos.x() && path.elementAt(i).y == oldPos.y()){
+            path.setElementPositionAt(i,newPos.x(), newPos.y());
+        }
+    }
+    poliline->setPath(path);
+    poliline->update();
 }
 
 int MapScene::getPointCount() const

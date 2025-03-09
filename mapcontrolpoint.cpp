@@ -70,9 +70,53 @@ void MapControlPoint::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 
 }
 
+void MapControlPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if(parentScene->getFinishPointFlag()){
+        if(event->button()==Qt::LeftButton){
+            leftButtonPresed = true;
+            setPreviousPosition(event->scenePos());
+            setFlag(ItemIsMovable);
+
+        }
+    }
+    QGraphicsItem::mousePressEvent(event);
+}
+
+void MapControlPoint::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    if(leftButtonPresed){
+        auto dx =  event->scenePos().x()- previousPosition.x();
+        auto dy = event->scenePos().y() - previousPosition.y();
+        QPointF oldPos = this->pos();
+        moveBy(dx, dy);
+        QPointF newPos = this->pos();
+        setPreviousPosition(event->scenePos());
+        emit moveMapPoint(oldPos, newPos);
+    }
+    QGraphicsItem::mouseMoveEvent(event);
+}
+
+void MapControlPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    if(event->button()==Qt::LeftButton){
+        leftButtonPresed = false;
+
+    }
+    QGraphicsItem::mouseReleaseEvent(event);
+}
+
 void MapControlPoint::setParentScene(MapScene *newParentScene)
 {
     parentScene = newParentScene;
+}
+
+void MapControlPoint::setPreviousPosition(QPointF pos)
+{
+    if(pos==previousPosition){
+        return;
+    }
+    previousPosition = pos;
 }
 
 MapControlPoint *MapControlPoint::getPrevPoint() const

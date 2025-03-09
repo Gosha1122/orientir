@@ -15,6 +15,7 @@ SOURCES += \
     mapitem.cpp \
     mapscene.cpp \
     mapview.cpp \
+    poliline.cpp \
     stylehelper.cpp \
     widget.cpp
 
@@ -25,6 +26,7 @@ HEADERS += \
     mapitem.h \
     mapscene.h \
     mapview.h \
+    poliline.h \
     stylehelper.h \
     widget.h
 
