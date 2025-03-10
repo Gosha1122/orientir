@@ -275,7 +275,7 @@ void Widget::settingsInit()
     mapScene->setKPWidth(3);
 
     ui->KPColorButton->setProperty("ColorName", "#ff0000");
-    ui->KPColorButton->setStyleSheet("background: #ff0000");
+    ui->KPColorButton->setStyleSheet(StyleHelper::getColorButtonStyle("#ff0000"));
     mapScene->setKPColor(Qt::red);
     //Старт/Финиш
     ui->StartSizeSpinBox->setValue(40);
@@ -285,14 +285,14 @@ void Widget::settingsInit()
     mapScene->setStartWidth(3);
 
     ui->StartColorButton->setProperty("ColorName", "#ff0000");
-    ui->StartColorButton->setStyleSheet("background: #ff0000");
+    ui->StartColorButton->setStyleSheet(StyleHelper::getColorButtonStyle("#ff0000"));
     mapScene->setStartColor(Qt::red);
     //Линии
     ui->LineWidthSpinBox->setValue(3);
     mapScene->setLineWidth(3);
 
     ui->LineColorButton->setProperty("ColorName", "#ff0000");
-    ui->LineColorButton->setStyleSheet("background: #ff0000");
+    ui->LineColorButton->setStyleSheet(StyleHelper::getColorButtonStyle("#ff0000"));
     mapScene->setLineColor(Qt::red);
 
 }

@@ -38,6 +38,9 @@ QString StyleHelper::getMapStyleDark()
         "}"
         "QComboBox::down-arrow {"
         "image: url(:/resourses/icons/down-arrow-10.png);"
+        "}"
+        "QComboBox::disabled{"
+        "background:#414A52;"
         "}";
     QString comboBoxViewStyle =
         "QComboBox QAbstractItemView{"
@@ -81,8 +84,11 @@ QString StyleHelper::getMapStyleDark()
             "QPushButton#minusButton::hover{"
             "icon:url(:/resourses/icons/minus-hover.svg);"
             "}"
-            "QLabel{"
+            "QWidget#rightPanelWidget QLabel{"
             "color:#D3D3D3;"
+            "}"
+            "QWidget#rightPanelWidget QLabel::disabled{"
+            "color:#A3A3A3;"
             "}"
             "QLabel#mapNameLabel{"
             "color:#D3D3D3;"
@@ -201,15 +207,44 @@ QString StyleHelper::getSpinBoxStyle()
 {
     return "QSpinBox{"
            "background-color: #6a777f;"
-           "border: none;"
+           "border: 1px solid #6a777f;"
            "border-radius:5px;"
            "padding: 5px;"
+           "font-size:14px;"
+           "color:#2B3035;"
+           "selection-color: #222;"
+           "selection-background-color: #eee;"
            "}"
            "QSpinBox::up-button{"
            "image: url(:/resourses/icons/up-arrow-10.png);"
            "}"
            "QSpinBox::down-button{"
            "image: url(:/resourses/icons/down-arrow-10.png);"
+           "}"
+           "QSpinBox::disabled{"
+           "background-color:#566167;"
+           "border-color:#59656a;"
+           "color:#3B4045;"
+           "}"
+           "QSpinBox::focus{"
+           "background:#fff;"
+           "}";
+}
+
+QString StyleHelper::getColorButtonStyle(QString color)
+{
+    QColor disabledColor(color);
+    disabledColor.setAlpha(100);
+    QString disabledColorStr = "rgba("+QString::number(disabledColor.red())+","
+                                     +QString::number(disabledColor.green())+","
+                                     +QString::number(disabledColor.blue())+",100);";
+    return "QPushButton{"
+           "border:1px solid #aab;"
+           "background:"+color+";"
+           "border-radius:3px;"
+           "}"
+           "QPushButton::disabled{"
+            "background:"+disabledColorStr+
            "}";
 }
 

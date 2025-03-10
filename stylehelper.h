@@ -20,6 +20,7 @@ public:
     QString static getEndPathButtonStyle();
     QString static getMapIconButtonStyle();
     QString static getSpinBoxStyle();
+    QString static getColorButtonStyle(QString color);
 private:
     QString static darkBgTop;
     QString static darkBgRight;

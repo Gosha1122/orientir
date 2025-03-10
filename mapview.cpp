@@ -2,7 +2,7 @@
 #include <QDebug>
 MapView::MapView(QWidget *parent):QGraphicsView(parent)
 {
-
+    setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
 }
 
 void MapView::enterEvent(QEnterEvent *event)
