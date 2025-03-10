@@ -13,6 +13,7 @@ SOURCES += \
     mapcontrolpoint.cpp \
     mapiconbutton.cpp \
     mapitem.cpp \
+    maplinekp.cpp \
     mapscene.cpp \
     mapview.cpp \
     poliline.cpp \
@@ -24,6 +25,7 @@ HEADERS += \
     mapcontrolpoint.h \
     mapiconbutton.h \
     mapitem.h \
+    maplinekp.h \
     mapscene.h \
     mapview.h \
     poliline.h \

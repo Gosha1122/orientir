@@ -31,6 +31,7 @@ private slots:
     void backButtonSlot();
     void endButtonPointSlot();
     void openMapSlot();
+    void SizeSpinBoxSlot(int value);
 private:
     Ui::Widget*  ui;
     QToolButton* currentTool;
