@@ -23,9 +23,11 @@ Widget::Widget(QWidget *parent)
     StyleHelper::setToolButtonStyleDark(ui->rulerButton, StyleHelper::MapIconsType::Ruler,false);
     StyleHelper::setToolButtonStyleDark(ui->startButton, StyleHelper::MapIconsType::Start,false);
     StyleHelper::setToolButtonStyleDark(ui->moveButton, StyleHelper::MapIconsType::Move,false);
+
     ui->pathButton->setProperty("MapIconsType", StyleHelper::MapIconsType::Path);
     ui->rulerButton->setProperty("MapIconsType", StyleHelper::MapIconsType::Ruler);
     ui->moveButton->setProperty("MapIconsType", StyleHelper::MapIconsType::Move);
+
     connect(ui->pathButton, &QToolButton::clicked, this, &Widget::changCurrentToolSlot);
     connect(ui->rulerButton, &QToolButton::clicked, this, &Widget::changCurrentToolSlot);
     connect(ui->moveButton, &QToolButton::clicked, this, &Widget::changCurrentToolSlot);
@@ -44,8 +46,13 @@ Widget::Widget(QWidget *parent)
     mapSizeValue = 100;
     connect(ui->plusButton,&QPushButton::clicked,this,&Widget::scaleSceneSlot);
     connect(ui->minusButton,&QPushButton::clicked,this,&Widget::scaleSceneSlot);
-    connect(ui->KPColorButton, &QPushButton::clicked, this,&Widget::ColorButtonSlot);
-    connect(ui->KPNumColorButton, &QPushButton::clicked, this,&Widget::ColorButtonSlot);
+
+    connect(ui->KPColorButton,    &QPushButton::clicked, this, &Widget::ColorButtonSlot);
+    connect(ui->KPNumColorButton, &QPushButton::clicked, this, &Widget::ColorButtonSlot);
+    connect(ui->StartColorButton, &QPushButton::clicked, this, &Widget::ColorButtonSlot);
+    connect(ui->LineColorButton,  &QPushButton::clicked, this, &Widget::ColorButtonSlot);
+
+
     connect(mapScene, &MapScene::zoomSignal, ui->plusButton,&QPushButton::click);
     connect(mapScene, &MapScene::unzoomSignal, ui->minusButton,&QPushButton::click);
 
@@ -98,6 +105,9 @@ Widget::Widget(QWidget *parent)
     connect(ui->KPWidthSpinBox, &QSpinBox::valueChanged, this, &Widget::SizeSpinBoxSlot);
     connect(ui->StartWidthSpinBox, &QSpinBox::valueChanged, this, &Widget::SizeSpinBoxSlot);
     connect(ui->LineWidthSpinBox, &QSpinBox::valueChanged, this, &Widget::SizeSpinBoxSlot);
+
+    connect(ui->CursorSizeComboBox, &QComboBox::currentTextChanged, this,  &Widget::setCursorSlot);
+    connect(ui->CursorColorComboBox, &QComboBox::currentTextChanged, this, &Widget::setCursorSlot);
 }
 
 Widget::~Widget()
@@ -124,18 +134,34 @@ void Widget::changCurrentToolSlot()
     case MapIcons::Move:
         qDebug() << "lskjdf";
 
-        ui->mapView->setCursorType(CType::OpenHand);
+        ui->mapView->setToolCursor(Cursors::ToolCursor::Move);
+
+        ui->mapView->setCursorType();
         ui->mapView->setDragMode(QGraphicsView::ScrollHandDrag);
         mapScene->setCurrentToolType(MapScene::ToolType::Move);
         break;
     case MapIcons::Path:
+
+        ui->mapView->setToolCursor(Cursors::ToolCursor::Point);
+
         ui->mapView->setDragMode(QGraphicsView::NoDrag);
-        ui->mapView->setCursorType(CType::PathCross);
+        ui->mapView->setCursorType();
         mapScene->setCurrentToolType(MapScene::ToolType::Path);
         break;
-    default:
+    case MapIcons::Ruler:
+
+        ui->mapView->setToolCursor(Cursors::ToolCursor::Ruler);
+
         ui->mapView->setDragMode(QGraphicsView::NoDrag);
-        ui->mapView->setCursorType(CType::PathCross);
+        ui->mapView->setCursorType();
+        mapScene->setCurrentToolType(MapScene::ToolType::Ruler);
+        break;
+    default:
+
+        ui->mapView->setToolCursor(Cursors::ToolCursor::Default);
+
+        ui->mapView->setDragMode(QGraphicsView::NoDrag);
+        ui->mapView->setCursorType();
         mapScene->setCurrentToolType(MapScene::ToolType::Default);
     }
 
@@ -176,10 +202,22 @@ void Widget::ColorButtonSlot()
         mapScene->setKPNumColor(newColor);
         ui->KPNumColorButton->setProperty("ColorName", newColor.name());
         ui->KPNumColorButton->setStyleSheet("background:" + newColor.name());
+        ui->KPNumColorButton->setStyleSheet(StyleHelper::getColorButtonStyle(newColor.name()));
     }else if(name == "KPColorButton"){
         mapScene->setKPColor(newColor);
         ui->KPColorButton->setProperty("ColorName", newColor.name());
         ui->KPColorButton->setStyleSheet("background:" + newColor.name());
+        ui->KPColorButton->setStyleSheet(StyleHelper::getColorButtonStyle(newColor.name()));
+    }else if(name == "StartColorButton"){
+        mapScene->setStartColor(newColor);
+        ui->StartColorButton->setProperty("ColorName", newColor.name());
+        ui->StartColorButton->setStyleSheet("background:" + newColor.name());
+        ui->StartColorButton->setStyleSheet(StyleHelper::getColorButtonStyle(newColor.name()));
+    }else if(name == "LineColorButton"){
+        mapScene->setLineColor(newColor);
+        ui->LineColorButton->setProperty("ColorName", newColor.name());
+        ui->LineColorButton->setStyleSheet("background:" + newColor.name());
+        ui->LineColorButton->setStyleSheet(StyleHelper::getColorButtonStyle(newColor.name()));
     }
 }
 
@@ -223,6 +261,7 @@ void Widget::endButtonPointSlot()
 {
     endPathButton->hide();
     mapScene->setFinishPointFlag(true);
+    mapScene->setFinishPoint();
 }
 
 void Widget::openMapSlot()
@@ -255,6 +294,27 @@ void Widget::SizeSpinBoxSlot(int value)
     }
 }
 
+void Widget::setCursorSlot(const QString& str)
+{
+    if(sender()->objectName() == "CursorSizeComboBox"){
+        qDebug() << "Size";
+        if(str == "Нормальный"){
+            ui->mapView->setCursorSize(Cursors::Size::Normal);
+        }else if(str == "Крупный"){
+            ui->mapView->setCursorSize(Cursors::Size::Big);
+        }
+    }else if(sender()->objectName() == "CursorColorComboBox"){
+        qDebug() << "Color";
+        if(str == "Черно-белый"){
+            ui->mapView->setCursorColor(Cursors::Color::WhiteAndBlack);
+        }else if(str == "Красно-белый"){
+            ui->mapView->setCursorColor(Cursors::Color::RedAndWhite);
+        }else if(str == "Красно-черный"){
+            ui->mapView->setCursorColor(Cursors::Color::RedAndBlack);
+        }
+    }
+}
+
 void Widget::settingsInit()
 {
     //Номера КП
@@ -265,7 +325,7 @@ void Widget::settingsInit()
     mapScene->setKPNumStyle(0);
 
     ui->KPNumColorButton->setProperty("ColorName", "#ff0000");
-    ui->KPNumColorButton->setStyleSheet("background: #ff0000");
+    ui->KPNumColorButton->setStyleSheet(StyleHelper::getColorButtonStyle("#ff0000"));
     mapScene->setKPNumColor(Qt::red);
     //КП
     ui->KPSizeSpinBox->setValue(40);
@@ -296,3 +356,4 @@ void Widget::settingsInit()
     mapScene->setLineColor(Qt::red);
 
 }
+

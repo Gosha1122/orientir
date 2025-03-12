@@ -13,9 +13,9 @@ MapControlPoint::MapControlPoint(QObject *parent)
 QRectF MapControlPoint::boundingRect() const
 {
     if(shape == KP){
-        return QRectF(-KPSize / 2, -KPSize / 2, KPSize, KPSize);
+        return QRectF(-KPSize / 2 - penWidth / 2, -KPSize / 2 - penWidth / 2, KPSize + penWidth, KPSize + penWidth);
     }else if(shape == Start || shape == Finish){
-        return QRectF(-StartSize / 2, -StartSize / 2, StartSize, StartSize);
+        return QRectF(-StartSize / 2 - StartWidth / 2, -StartSize / 2 - StartWidth / 2, StartSize + StartWidth, StartSize + StartWidth);
     }
     return QRectF(-15, -15, 30, 30);
 }
@@ -29,10 +29,25 @@ void MapControlPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
         QPen pen(StartColor);
         pen.setWidth(StartWidth);
         painter->setPen(pen);
-
-        QPoint points[3]={{-StartSize / 2, StartSize / 3},
-                            {0,-StartSize / 2},
-                            {StartSize / 2, StartSize / 3}};
+        QPoint points[3];
+        QPoint p1(-StartSize / 2, StartSize / 3);
+        QPoint p2(0,-StartSize / 2);
+        QPoint p3(StartSize / 2, StartSize / 3);
+        if(finishLine != nullptr && false){
+            qreal cos_a = 1 - (qPow(qAbs(finishLine->line().p1().x() - p3.x()), 2) + qPow(qAbs(finishLine->line().p1().y() - p3.y()), 2)) / (2 * qPow(StartSize * 6.25 / 12, 2));
+            qreal sin_a = qSqrt(1 - cos_a * cos_a);
+            qDebug() << cos_a;
+            qDebug() << sin_a;
+            QPoint new_p1(static_cast<int>(p1.x() * cos_a - p1.y() * sin_a), static_cast<int>(p1.x() * sin_a + p1.y() * cos_a));
+            QPoint new_p2(static_cast<int>(p2.x() * cos_a - p2.y() * sin_a), static_cast<int>(p2.x() * sin_a + p2.y() * cos_a));
+            QPoint new_p3(static_cast<int>(p3.x() * cos_a - p3.y() * sin_a), static_cast<int>(p3.x() * sin_a + p3.y() * cos_a));
+            p1 = new_p1;
+            p2 = new_p2;
+            p3 = new_p3;
+        }
+        points[0] = p1;
+        points[1] = p2;
+        points[2] = p3;
         painter->drawPolygon(points, 3);
         painter->setBrush(penColor);
         painter->drawEllipse(-2, -2, 4, 4);
@@ -132,6 +147,8 @@ void MapControlPoint::setFinishLine(MapLineKP *newFinishLine)
 {
     finishLine = newFinishLine;
 }
+
+
 
 MapLineKP *MapControlPoint::getStartLine() const
 {

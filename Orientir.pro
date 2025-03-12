@@ -44,4 +44,30 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     resourses.qrc
 
-DISTFILES +=
+DISTFILES += \
+    resourses/cursors/bw_large_move_cursor.png \
+    resourses/cursors/bw_large_point_cursor.png \
+    resourses/cursors/bw_large_ruler_cursor.png \
+    resourses/cursors/bw_move_cursor.png \
+    resourses/cursors/bw_point_cursor.png \
+    resourses/cursors/bw_ruler_cursor.png \
+    resourses/cursors/cross-blue.png \
+    resourses/cursors/cross-cursor-blue-2.png \
+    resourses/cursors/cross-cursor-blue-3.png \
+    resourses/cursors/cross-cursor-green-2.png \
+    resourses/cursors/cross-cursor-green-3.png \
+    resourses/cursors/cross-cursor-red-2.png \
+    resourses/cursors/cross-cursor-red.png \
+    resourses/cursors/cross-green.png \
+    resourses/cursors/rb_large_move_cursor.png \
+    resourses/cursors/rb_large_point_cursor.png \
+    resourses/cursors/rb_large_ruler_cursor.png \
+    resourses/cursors/rb_move_cursor.png \
+    resourses/cursors/rb_point_cursor.png \
+    resourses/cursors/rb_ruler_cursor.png \
+    resourses/cursors/rw_large_move_cursor.png \
+    resourses/cursors/rw_large_point_cursor.png \
+    resourses/cursors/rw_large_ruler_cursor.png \
+    resourses/cursors/rw_move_cursor.png \
+    resourses/cursors/rw_point_cursor.png \
+    resourses/cursors/rw_ruler_cursor.png
