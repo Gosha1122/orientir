@@ -15,4 +15,24 @@ enum ToolType{
     Move            //Сдвинуть
 };
 }
+
+namespace Cursors{
+
+enum Size{
+    Normal,
+    Big
+};
+
+enum Color{
+    WhiteAndBlack,
+    RedAndWhite,
+    RedAndBlack
+};
+enum ToolCursor{
+    Move,
+    Point,
+    Ruler,
+    Default
+};
+}
 #endif // DEFINES_H

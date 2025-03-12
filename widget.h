@@ -21,6 +21,8 @@ class Widget : public QWidget
 public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
+
+
 private slots:
     void changCurrentToolSlot();
     void scaleSceneSlot();
@@ -32,6 +34,7 @@ private slots:
     void endButtonPointSlot();
     void openMapSlot();
     void SizeSpinBoxSlot(int value);
+    void setCursorSlot(const QString& str);
 private:
     Ui::Widget*  ui;
     QToolButton* currentTool;
@@ -40,6 +43,9 @@ private:
     QPushButton* endPathButton;
 
 
+
+
     void settingsInit();
+
 };
 #endif // WIDGET_H

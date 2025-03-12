@@ -58,6 +58,7 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
                     line->setFlagStartPoint(MapLineKP::StartPoint::beginStartPoint);
                     line->setRStart(StartSize / 2);
                     qDebug() << StartSize;
+                    lastItem->update();
                 }
                 line->setKPLine(oldPoint.x(), oldPoint.y(), event->scenePos().x(), event->scenePos().y());
                 QPen pen;

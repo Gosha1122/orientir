@@ -35,5 +35,23 @@
         <file>resourses/cursors/cross-cursor-green-3.png</file>
         <file>resourses/cursors/cross-cursor-blue-2.png</file>
         <file>resourses/cursors/cross-cursor-blue-3.png</file>
+        <file>resourses/cursors/bw_large_move_cursor.png</file>
+        <file>resourses/cursors/bw_large_point_cursor.png</file>
+        <file>resourses/cursors/bw_large_ruler_cursor.png</file>
+        <file>resourses/cursors/bw_move_cursor.png</file>
+        <file>resourses/cursors/bw_point_cursor.png</file>
+        <file>resourses/cursors/bw_ruler_cursor.png</file>
+        <file>resourses/cursors/rb_large_move_cursor.png</file>
+        <file>resourses/cursors/rb_large_point_cursor.png</file>
+        <file>resourses/cursors/rb_large_ruler_cursor.png</file>
+        <file>resourses/cursors/rb_move_cursor.png</file>
+        <file>resourses/cursors/rb_point_cursor.png</file>
+        <file>resourses/cursors/rb_ruler_cursor.png</file>
+        <file>resourses/cursors/rw_large_move_cursor.png</file>
+        <file>resourses/cursors/rw_large_point_cursor.png</file>
+        <file>resourses/cursors/rw_large_ruler_cursor.png</file>
+        <file>resourses/cursors/rw_move_cursor.png</file>
+        <file>resourses/cursors/rw_point_cursor.png</file>
+        <file>resourses/cursors/rw_ruler_cursor.png</file>
     </qresource>
 </RCC>
