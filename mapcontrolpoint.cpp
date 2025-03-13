@@ -15,7 +15,8 @@ QRectF MapControlPoint::boundingRect() const
     if(shape == KP){
         return QRectF(-KPSize / 2 - penWidth / 2, -KPSize / 2 - penWidth / 2, KPSize + penWidth, KPSize + penWidth);
     }else if(shape == Start || shape == Finish){
-        return QRectF(-StartSize / 2 - StartWidth / 2, -StartSize / 2 - StartWidth / 2, StartSize + StartWidth, StartSize + StartWidth);
+        int pointSize = std::max(StartSize, KPSize);
+        return QRectF(-pointSize / 2 - StartWidth / 2, -pointSize / 2 - StartWidth / 2, pointSize + StartWidth, pointSize + StartWidth);
     }
     return QRectF(-15, -15, 30, 30);
 }
@@ -68,6 +69,9 @@ void MapControlPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
         painter->drawEllipse(-StartSize / 3, -StartSize / 3, StartSize * 2 / 3, StartSize * 2 / 3);
         painter->setBrush(penColor);
         painter->drawEllipse(-2, -2, 4, 4);
+
+        this->setOpacity(0.5);
+
     }
 }
 
