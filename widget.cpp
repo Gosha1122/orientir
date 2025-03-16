@@ -10,6 +10,8 @@
 #include <QDebug>
 #include <QPushButton>
 #include "mapiconbutton.h"
+#include <QGridLayout>
+#include "mapsettings.h"
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -85,12 +87,18 @@ Widget::Widget(QWidget *parent)
     connect(ui->backButton, &QToolButton::clicked,
             this, &Widget::backButtonSlot);
 
+    grid = new QGridLayout;
+    ui->scrollAreaWidgetContents->setLayout(grid);
+    for(int i=0;i<8;i++){
+        MapIconButton* iconBtn = new MapIconButton;
+        iconBtn->setStyleSheet(StyleHelper::getMapIconButtonStyle());
+        iconBtn->setFixedSize(320,380);
+        grid->addWidget(iconBtn, i/4, i%4);
+        connect(iconBtn, &MapIconButton::openMap, this, &Widget::openMapSlot);
 
-    MapIconButton* iconBtn =
-        new MapIconButton(ui->mapsListPage);
-    iconBtn->setStyleSheet(StyleHelper::getMapIconButtonStyle());
+    }
 
-    connect(iconBtn, &MapIconButton::openMap, this, &Widget::openMapSlot);
+
 
     ui->KPNumSpinBox->setStyleSheet(StyleHelper::getSpinBoxStyle());
     ui->KPSizeSpinBox->setStyleSheet(StyleHelper::getSpinBoxStyle());
@@ -107,7 +115,8 @@ Widget::Widget(QWidget *parent)
     connect(ui->LineWidthSpinBox, &QSpinBox::valueChanged, this, &Widget::SizeSpinBoxSlot);
 
     connect(ui->CursorSizeComboBox, &QComboBox::currentTextChanged, this,  &Widget::setCursorSlot);
-    connect(ui->CursorColorComboBox, &QComboBox::currentTextChanged, this, &Widget::setCursorSlot);
+    connect(ui->CursorColorComboBox, &QComboBox::currentTextChanged, this, &Widget::setCursorSlot);  
+    connect(ui->addMapButton, &QPushButton::clicked, this, &Widget::addMapButtonSlot);
 }
 
 Widget::~Widget()
@@ -312,6 +321,14 @@ void Widget::setCursorSlot(const QString& str)
         }else if(str == "Красно-черный"){
             ui->mapView->setCursorColor(Cursors::Color::RedAndBlack);
         }
+    }
+}
+
+void Widget::addMapButtonSlot()
+{
+    MapSettings dlg(this);
+    if(dlg.exec()==QDialog::Accepted){
+
     }
 }
 

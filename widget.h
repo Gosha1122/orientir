@@ -12,6 +12,7 @@ class Widget;
 }
 class QToolButton;
 class QPushButton;
+class QGridLayout;
 QT_END_NAMESPACE
 
 class Widget : public QWidget
@@ -35,6 +36,7 @@ private slots:
     void openMapSlot();
     void SizeSpinBoxSlot(int value);
     void setCursorSlot(const QString& str);
+    void addMapButtonSlot();
 private:
     Ui::Widget*  ui;
     QToolButton* currentTool;
@@ -42,7 +44,7 @@ private:
     int          mapSizeValue;
     QPushButton* endPathButton;
 
-
+    QGridLayout* grid;
 
 
     void settingsInit();

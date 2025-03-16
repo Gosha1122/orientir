@@ -53,5 +53,6 @@
         <file>resourses/cursors/rw_move_cursor.png</file>
         <file>resourses/cursors/rw_point_cursor.png</file>
         <file>resourses/cursors/rw_ruler_cursor.png</file>
+        <file>resourses/maps/1.png</file>
     </qresource>
 </RCC>
