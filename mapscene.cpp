@@ -15,6 +15,7 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if(event->button()==Qt::LeftButton){
         if(currentToolType==ToolType::Path){
             MapControlPoint* point = new MapControlPoint;
+            point->setObjectName("Point");
             if(!startPointFlag && !finishPointFlag){
                 qDebug() << "Start";
                 startPointFlag = true;
@@ -52,6 +53,7 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
                 poliline->setPath(path);
                 */
                 MapLineKP* line = new MapLineKP;
+                line->setObjectName("Line");
                 line->setRKP(KPSize / 2);
                 if(flagLastItemStart){
                     flagLastItemStart = false;
@@ -69,7 +71,6 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
                 oldPoint = event->scenePos();
 
 
-
                 lastItem->setFinishLine(line);
                 point->setStartLine(line);
 
@@ -82,6 +83,16 @@ void MapScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
                     this, &MapScene::removeMapPointSlot);
             connect(point, &MapControlPoint::moveMapPoint,
                     this, &MapScene::moveMapPoitSlot);
+
+            connect(point, &MapControlPoint::movePointSignal, this, &MapScene::movePointSlot);
+
+        }else if(currentToolType == ToolType::Ruler){
+            if(poliline != nullptr){
+                QPainterPath new_path = poliline->path();
+                new_path.lineTo(event->scenePos());
+                poliline->setPath(new_path);
+                poliline->setEndPoint(event->scenePos());
+            }
         }
     }
     QGraphicsScene::mousePressEvent(event);
@@ -141,6 +152,11 @@ void MapScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 
 }
 
+PoliLine *MapScene::getPoliline() const
+{
+    return poliline;
+}
+
 bool MapScene::getFinishPointFlag() const
 {
     return finishPointFlag;
@@ -149,6 +165,82 @@ bool MapScene::getFinishPointFlag() const
 void MapScene::setFinishPointFlag(bool newFinishPointFlag)
 {
     finishPointFlag = newFinishPointFlag;
+}
+
+void MapScene::startRulerMode(MapControlPoint *mp)
+{
+
+    poliline = new PoliLine;
+    QPainterPath new_path;
+    new_path.moveTo(mp->scenePos());
+    poliline->setPath(new_path);
+    poliline->setStartPoint(mp);
+    addItem(poliline);
+    poliline->setEndPoint(mp->scenePos());
+    poliline->setPen(QPen(LineColor, LineWidth));
+
+    polilineVec.push_back(poliline);
+
+    QList<QGraphicsItem*> lst = this->items();
+    for(int i = 0; i < lst.count(); i++){
+        if(lst[i] == mapItem){
+            continue;
+        }
+        MapControlPoint* mapPoint = qgraphicsitem_cast<MapControlPoint*>(lst[i]);
+        if(mapPoint == mp){
+            continue;
+        }else if(mapPoint->scenePos() == mp->getFinishLine()->getFinishPoint()){
+            poliline->setFinishPoint(mapPoint);
+            continue;
+        }
+        if(mapPoint->objectName() == "Line"){
+            MapLineKP* line = qgraphicsitem_cast<MapLineKP*>(lst[i]);
+            line->hide();
+        }else if(mapPoint->objectName() == "Point"){
+            QColor color = mapPoint->getColorPoint();
+            color.setAlpha(100);
+            mapPoint->setColorPoint(color);
+            mapPoint->setColorAlphaFlag(false);
+            mapPoint->update();
+        }
+    }
+
+    emit startRulerModeSignal();
+}
+
+void MapScene::finishRulerMode()
+{
+    QPainterPath path = poliline->path();
+    qDebug() << poliline->getFinishPoint()->scenePos() << " " << poliline->getFinishPoint()->getStartLine()->line().p2();
+    QPointF lastPoint = poliline->getEndPoint();
+    qDebug() << lastPoint;
+    qDebug() << poliline->getStartPoint()->scenePos();
+    if(qPow(qAbs(lastPoint.x() - poliline->getFinishPoint()->scenePos().x()), 2) +
+        qPow(qAbs(lastPoint.y() - poliline->getFinishPoint()->scenePos().y()), 2) <=
+        KPSize * KPSize  / 4){
+        qDebug() << "FinishRuler";
+        path.setElementPositionAt(path.elementCount() - 1, poliline->getFinishPoint()->scenePos().x(), poliline->getFinishPoint()->scenePos().y());
+        poliline->setPath(path);
+    }else{
+        polilineVec.pop_back();
+        delete poliline;
+    }
+    poliline = nullptr;
+    qDebug() << polilineVec.count();
+    QList<QGraphicsItem*> lst = this->items();
+    for(int i = 0; i < lst.count(); i++){
+        if(lst[i] == mapItem){
+            continue;
+        }
+        MapControlPoint* mapPoint = qgraphicsitem_cast<MapControlPoint*>(lst[i]);
+        if(mapPoint->objectName() == "Line"){
+            MapLineKP* line = qgraphicsitem_cast<MapLineKP*>(lst[i]);
+            line->hide();
+        }else if(mapPoint->objectName() == "Point"){
+            mapPoint->setColorAlphaFlag(true);
+            mapPoint->update();
+        }
+    }
 }
 
 QGraphicsItem *MapScene::getMapItem() const
@@ -267,6 +359,21 @@ void MapScene::moveMapPoitSlot(QPointF oldPos, QPointF newPos)
         }
     }
     poliline->setPath(path);
+}
+
+void MapScene::movePointSlot(MapControlPoint *mp)
+{
+    QList<QGraphicsItem *> lst = this->items();
+    for(int i = 0; i < lst.size(); i++){
+        if(lst[i] != mapItem){
+            MapControlPoint* mp_1 = qgraphicsitem_cast<MapControlPoint*>(lst[i]);
+            if(mp_1->scenePos() == mp->getStartLine()->getStartPoint()){
+                mp_1->update();
+            }else if(mp_1->scenePos() == mp->getFinishLine()->getFinishPoint()){
+                mp_1->update();
+            }
+        }
+    }
 }
 
 int MapScene::getPointCount() const

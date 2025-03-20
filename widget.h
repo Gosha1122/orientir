@@ -37,6 +37,7 @@ private slots:
     void SizeSpinBoxSlot(int value);
     void setCursorSlot(const QString& str);
     void addMapButtonSlot();
+    void startRulerModeSlot();
 private:
     Ui::Widget*  ui;
     QToolButton* currentTool;
@@ -46,8 +47,11 @@ private:
 
     QGridLayout* grid;
 
+    MapApl::ToolType toolMode = MapApl::ToolType::Move;
+
 
     void settingsInit();
+    void setRulerMode();
 
 };
 #endif // WIDGET_H
