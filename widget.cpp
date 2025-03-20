@@ -117,6 +117,8 @@ Widget::Widget(QWidget *parent)
     connect(ui->CursorSizeComboBox, &QComboBox::currentTextChanged, this,  &Widget::setCursorSlot);
     connect(ui->CursorColorComboBox, &QComboBox::currentTextChanged, this, &Widget::setCursorSlot);  
     connect(ui->addMapButton, &QPushButton::clicked, this, &Widget::addMapButtonSlot);
+
+    connect(mapScene, &MapScene::startRulerModeSignal, this, &Widget::startRulerModeSlot);
 }
 
 Widget::~Widget()
@@ -143,6 +145,8 @@ void Widget::changCurrentToolSlot()
     case MapIcons::Move:
         qDebug() << "lskjdf";
 
+        toolMode = MapApl::ToolType::Move;
+
         ui->mapView->setToolCursor(Cursors::ToolCursor::Move);
 
         ui->mapView->setCursorType();
@@ -150,6 +154,8 @@ void Widget::changCurrentToolSlot()
         mapScene->setCurrentToolType(MapScene::ToolType::Move);
         break;
     case MapIcons::Path:
+
+        toolMode = MapApl::ToolType::Path;
 
         ui->mapView->setToolCursor(Cursors::ToolCursor::Point);
 
@@ -159,6 +165,8 @@ void Widget::changCurrentToolSlot()
         break;
     case MapIcons::Ruler:
 
+        toolMode = MapApl::ToolType::Ruler;
+
         ui->mapView->setToolCursor(Cursors::ToolCursor::Ruler);
 
         ui->mapView->setDragMode(QGraphicsView::NoDrag);
@@ -166,6 +174,7 @@ void Widget::changCurrentToolSlot()
         mapScene->setCurrentToolType(MapScene::ToolType::Ruler);
         break;
     default:
+
 
         ui->mapView->setToolCursor(Cursors::ToolCursor::Default);
 
@@ -269,8 +278,12 @@ void Widget::backButtonSlot()
 void Widget::endButtonPointSlot()
 {
     endPathButton->hide();
-    mapScene->setFinishPointFlag(true);
-    mapScene->setFinishPoint();
+    if(toolMode == MapApl::ToolType::Path){
+        mapScene->setFinishPointFlag(true);
+        mapScene->setFinishPoint();
+    }else if(toolMode == MapApl::ToolType::Ruler){
+        mapScene->finishRulerMode();
+    }
 }
 
 void Widget::openMapSlot()
@@ -332,6 +345,11 @@ void Widget::addMapButtonSlot()
     }
 }
 
+void Widget::startRulerModeSlot()
+{
+    endPathButton->show();
+}
+
 void Widget::settingsInit()
 {
     //Номера КП
@@ -372,5 +390,10 @@ void Widget::settingsInit()
     ui->LineColorButton->setStyleSheet(StyleHelper::getColorButtonStyle("#ff0000"));
     mapScene->setLineColor(Qt::red);
 
+}
+
+void Widget::setRulerMode()
+{
+    mapScene->setCurrentToolType(MapScene::ToolType::Ruler);
 }
 

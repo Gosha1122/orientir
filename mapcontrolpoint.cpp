@@ -27,18 +27,36 @@ void MapControlPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
     painter->setBrush(Qt::NoBrush);
 
     if(shape == Start){
-        QPen pen(StartColor);
+        QPen pen;
+        if(!colorPoint.isValid() || colorAlphaFlag){
+            pen.setColor(StartColor);
+            colorPoint = StartColor;
+        }else{
+            pen.setColor(colorPoint);
+        }
         pen.setWidth(StartWidth);
         painter->setPen(pen);
         QPoint points[3];
-        QPoint p1(-StartSize / 2, StartSize / 3);
+        QPoint p1(-qSqrt(3) * StartSize / 4, StartSize / 4);
         QPoint p2(0,-StartSize / 2);
-        QPoint p3(StartSize / 2, StartSize / 3);
-        if(finishLine != nullptr && false){
-            qreal cos_a = 1 - (qPow(qAbs(finishLine->line().p1().x() - p3.x()), 2) + qPow(qAbs(finishLine->line().p1().y() - p3.y()), 2)) / (2 * qPow(StartSize * 6.25 / 12, 2));
+        QPoint p3(qSqrt(3) * StartSize / 4, StartSize / 4);
+        if(finishLine != nullptr){
+            QPoint pn = minPoint(p1, p2, p3);
+            qreal R = StartSize / 2;
+            qreal d = qSqrt(qPow(finishLine->line().p1().x() - pn.x() - this->scenePos().x(), 2) + qPow(finishLine->line().p1().y() - pn.y() - this->scenePos().y(), 2));
+            qreal cos_a = 1 - d * d / (2 * R * R);
+            //qreal a_g = qAcos(cos_a);
             qreal sin_a = qSqrt(1 - cos_a * cos_a);
+            qDebug() << StartSize;
+            qDebug() << d;
+            qDebug() << R;
             qDebug() << cos_a;
             qDebug() << sin_a;
+            /*
+            QPoint new_p1(static_cast<int>(p1.x() * qCos(a_g) - p1.y() * qSin(a_g)), static_cast<int>(p1.x() * qSin(a_g) + p1.y() * qCos(a_g)));
+            QPoint new_p2(static_cast<int>(p2.x() * qCos(a_g) - p2.y() * qSin(a_g)), static_cast<int>(p2.x() * qSin(a_g) + p2.y() * qCos(a_g)));
+            QPoint new_p3(static_cast<int>(p3.x() * qCos(a_g) - p3.y() * qSin(a_g)), static_cast<int>(p3.x() * qSin(a_g) + p3.y() * qCos(a_g)));
+            */
             QPoint new_p1(static_cast<int>(p1.x() * cos_a - p1.y() * sin_a), static_cast<int>(p1.x() * sin_a + p1.y() * cos_a));
             QPoint new_p2(static_cast<int>(p2.x() * cos_a - p2.y() * sin_a), static_cast<int>(p2.x() * sin_a + p2.y() * cos_a));
             QPoint new_p3(static_cast<int>(p3.x() * cos_a - p3.y() * sin_a), static_cast<int>(p3.x() * sin_a + p3.y() * cos_a));
@@ -53,7 +71,13 @@ void MapControlPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
         painter->setBrush(penColor);
         painter->drawEllipse(-2, -2, 4, 4);
     }else if(shape==KP){
-        QPen pen(penColor);
+        QPen pen;
+        if(!colorPoint.isValid() || colorAlphaFlag){
+            pen.setColor(penColor);
+            colorPoint = penColor;
+        }else{
+            pen.setColor(colorPoint);
+        }
         pen.setWidth(penWidth);
         painter->setPen(pen);
 
@@ -61,7 +85,13 @@ void MapControlPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
         painter->setBrush(penColor);
         painter->drawEllipse(-2, -2, 4, 4);
     }else if(shape==Finish){
-        QPen pen(StartColor);
+        QPen pen;
+        if(!colorPoint.isValid() || colorAlphaFlag){
+            pen.setColor(StartColor);
+            colorPoint = StartColor;
+        }else{
+            pen.setColor(colorPoint);
+        }
         pen.setWidth(StartWidth);
         painter->setPen(pen);
 
@@ -92,12 +122,16 @@ void MapControlPoint::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 
 void MapControlPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(parentScene->getFinishPointFlag()){
-        if(event->button()==Qt::LeftButton){
-            leftButtonPresed = true;
-            setPreviousPosition(event->scenePos());
-            setFlag(ItemIsMovable);
+    if(parentScene->getCurrentToolType() == MapScene::ToolType::Path){
+        if(parentScene->getFinishPointFlag()){
+            if(event->button()==Qt::LeftButton){
+                leftButtonPresed = true;
+                setPreviousPosition(event->scenePos());
+                setFlag(ItemIsMovable);
+            }
         }
+    }else if(parentScene->getCurrentToolType() == MapScene::ToolType::Ruler && parentScene->getPoliline() == nullptr){
+        parentScene->startRulerMode(this);
     }
     QGraphicsItem::mousePressEvent(event);
 }
@@ -124,6 +158,7 @@ void MapControlPoint::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             finishLine->setRKP(KPSize / 2);
             finishLine->setKPLine(oldPos.x(), oldPos.y(), finishLine->getFinishPoint().x(), finishLine->getFinishPoint().y());
         }
+        emit movePointSignal(this);
     }
     QGraphicsItem::mouseMoveEvent(event);
 }
@@ -140,6 +175,35 @@ void MapControlPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         }
     }
     QGraphicsItem::mouseReleaseEvent(event);
+}
+
+QPoint MapControlPoint::minPoint(QPoint p1, QPoint p2, QPoint p3)
+{
+    qreal d_1 = qPow(finishLine->line().p1().x() - p1.x() - this->scenePos().x(), 2) + qPow(finishLine->line().p1().y() - p1.y() - this->scenePos().y(), 2);
+    qreal d_2 = qPow(finishLine->line().p1().x() - p2.x() - this->scenePos().x(), 2) + qPow(finishLine->line().p1().y() - p2.y() - this->scenePos().y(), 2);
+    qreal d_3 = qPow(finishLine->line().p1().x() - p3.x() - this->scenePos().x(), 2) + qPow(finishLine->line().p1().y() - p3.y() - this->scenePos().y(), 2);
+    if(d_1 >= d_2 && d_1 >= d_3){
+        return p2;
+    }else if(d_2 >= d_1 && d_2 >= d_3){
+        return p3;
+    }else{
+        return p1;
+    }
+}
+
+void MapControlPoint::setColorAlphaFlag(bool newColorAlphaFlag)
+{
+    colorAlphaFlag = newColorAlphaFlag;
+}
+
+QColor MapControlPoint::getColorPoint() const
+{
+    return colorPoint;
+}
+
+void MapControlPoint::setColorPoint(const QColor &newColorPoint)
+{
+    colorPoint = newColorPoint;
 }
 
 MapLineKP *MapControlPoint::getFinishLine() const

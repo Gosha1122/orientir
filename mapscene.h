@@ -53,18 +53,24 @@ public:
     bool itemContextMenuFlag = false;
     void setFinishPointFlag(bool newFinishPointFlag);
 
-
+    void startRulerMode(MapControlPoint* mp);
+    void finishRulerMode();
 
     bool getFinishPointFlag() const;
+
+    PoliLine *getPoliline() const;
 
 private slots:
     void removeMapPointSlot(MapControlPoint* point);
     void moveMapPoitSlot(QPointF oldPos, QPointF newPos);
+    void movePointSlot(MapControlPoint* mp);
+
 signals:
     void addStartPointSignal();
     void zoomSignal();
     void unzoomSignal();
     void removeAllMapPointsSignal();
+    void startRulerModeSignal();
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
@@ -96,11 +102,13 @@ protected:
     int pointCount = 0;
     QGraphicsItem* mapItem;
     MapControlPoint * lastItem;
-    PoliLine* poliline;
+    PoliLine* poliline = nullptr;
+    QVector<PoliLine*> polilineVec;
 
     QPointF oldPoint;
 
     bool flagLastItemStart = false;
+
 
 };
 

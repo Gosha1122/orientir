@@ -38,6 +38,12 @@ public:
     MapLineKP *getFinishLine() const;
     void setFinishLine(MapLineKP *newFinishLine);
 
+    void setColorPoint(const QColor &newColorPoint);
+
+    QColor getColorPoint() const;
+
+    void setColorAlphaFlag(bool newColorAlphaFlag);
+
 protected:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -48,8 +54,12 @@ protected:
 signals:
     void removeMapPoint(MapControlPoint* point);
     void moveMapPoint(QPointF oldPos, QPointF newPos);
+    void movePointSignal(MapControlPoint* mp);
 private:
     Shape shape;
+
+    QColor colorPoint;
+    bool   colorAlphaFlag = false;
 
     QColor textColor;
     QColor penColor ;
@@ -71,6 +81,8 @@ private:
 
     MapLineKP* startLine = nullptr;
     MapLineKP* finishLine = nullptr;
+
+    QPoint minPoint(QPoint p1, QPoint p2, QPoint p3);
 
 };
 
