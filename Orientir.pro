@@ -11,6 +11,7 @@ CONFIG += c++17
 SOURCES += \
     main.cpp \
     mapcontrolpoint.cpp \
+    mapcropborderitem.cpp \
     mapiconbutton.cpp \
     mapitem.cpp \
     maplinekp.cpp \
@@ -24,6 +25,7 @@ SOURCES += \
 HEADERS += \
     defines.h \
     mapcontrolpoint.h \
+    mapcropborderitem.h \
     mapiconbutton.h \
     mapitem.h \
     maplinekp.h \

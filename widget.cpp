@@ -92,7 +92,7 @@ Widget::Widget(QWidget *parent)
     for(int i=0;i<8;i++){
         MapIconButton* iconBtn = new MapIconButton;
         iconBtn->setStyleSheet(StyleHelper::getMapIconButtonStyle());
-        iconBtn->setFixedSize(320,380);
+        iconBtn->setFixedSize(320,280);
         grid->addWidget(iconBtn, i/4, i%4);
         connect(iconBtn, &MapIconButton::openMap, this, &Widget::openMapSlot);
 
@@ -128,7 +128,7 @@ Widget::~Widget()
 
 void Widget::changCurrentToolSlot()
 {
-    using CType    = MapApl::CursorType;
+    //using CType    = MapApl::CursorType;
     using MapIcons = StyleHelper::MapIconsType;
     QToolButton* btn = qobject_cast<QToolButton*>(sender());
     if(currentTool== btn)
@@ -173,6 +173,7 @@ void Widget::changCurrentToolSlot()
         ui->mapView->setCursorType();
         mapScene->setCurrentToolType(MapScene::ToolType::Ruler);
         break;
+
     default:
 
 
