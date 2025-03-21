@@ -15,6 +15,7 @@ class MapLineKP;
 class MapControlPoint :public QObject, public QGraphicsItem
 {
     Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
 public:
     enum Shape{
       Start,

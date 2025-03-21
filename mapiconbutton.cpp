@@ -17,6 +17,7 @@ MapIconButton::~MapIconButton()
 
 void MapIconButton::mousePressEvent(QMouseEvent *event)
 {
+    Q_UNUSED(event);
     qDebug() << "Pressed";
     emit openMap();
 }
