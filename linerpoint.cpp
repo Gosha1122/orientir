@@ -11,6 +11,8 @@ QRectF LinerPoint::boundingRect() const
 
 void LinerPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
     painter->setRenderHint(QPainter::Antialiasing);
     painter->setBrush(Qt::red);
     painter->setPen(Qt::NoPen);
@@ -24,15 +26,33 @@ void LinerPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 
 void LinerPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-
+    if(event->button()==Qt::LeftButton){
+        leftMouseClick = true;
+        setPreviousPosition(event->scenePos());
+    }
 }
 
 void LinerPoint::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-
+    if(leftMouseClick){
+        auto dx =  event->scenePos().x()- previousPosition.x();
+        auto dy = event->scenePos().y() - previousPosition.y();
+        setPreviousPosition(event->scenePos());
+        moveBy(dx, dy);
+        emit updatePositionSignal();
+    }
 }
 
 void LinerPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+    if(event->button()==Qt::LeftButton){
+        leftMouseClick = false;
 
+    }
+}
+
+void LinerPoint::setPreviousPosition(const QPointF newPos)
+{
+    if(previousPosition != newPos)
+        previousPosition = newPos;
 }

@@ -10,6 +10,7 @@
 class LinerPoint :public QObject, public QGraphicsItem
 {
     Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
 public:
     explicit LinerPoint(QObject *parent = nullptr);
     QRectF boundingRect() const override;
@@ -20,6 +21,12 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
 signals:
+    void updatePositionSignal();
+private:
+    QPointF previousPosition;
+    bool leftMouseClick = false;
+
+    void setPreviousPosition(const QPointF newPos);
 };
 
 #endif // LINERPOINT_H

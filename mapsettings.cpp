@@ -17,6 +17,9 @@ MapSettings::MapSettings(QWidget *parent)
     ui->setupUi(this);
     ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    ui->graphicsView_2->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->graphicsView_2->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     cropScene = new QGraphicsScene;
     cropItem = new MapCropBorderItem;
     ui->graphicsView->setSceneRect(0,0,540, 310);
@@ -28,9 +31,18 @@ MapSettings::MapSettings(QWidget *parent)
     point_1 = new LinerPoint;
     point_2 = new LinerPoint;
     pointsLine = new QGraphicsLineItem;
+    pointText = new QGraphicsSimpleTextItem(point_1);
+    pointText->setText("10");
+    pointText->setBrush(QBrush(Qt::red));
+    QFont font = pointText->font();
+    font.setPixelSize(14);
+    pointText->setFont(font);
+    pointText->setPos(-25,-30);
     cropScene->addItem(pointsLine);
     cropScene->addItem(point_1);
     cropScene->addItem(point_2);
+    connect(point_1, &LinerPoint::updatePositionSignal, this, &MapSettings::updatePointPositonSlot);
+    connect(point_2, &LinerPoint::updatePositionSignal, this, &MapSettings::updatePointPositonSlot);
 
     point_1->hide();
     point_2->hide();
@@ -74,35 +86,7 @@ void MapSettings::on_addButton_clicked()
     }
     ui->stackedWidget->setCurrentWidget(ui->page_2);
 
-    /*
 
-    QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QDir dir(dirPath);
-    if(!dir.exists()){
-        if(!dir.mkpath(dirPath)){
-            qDebug() << "Error create dir" << dirPath;
-            return;
-        }
-    }
-    qDebug() << dirPath;
-    QString path = ui->pathEdit->text().trimmed();
-    if(path.isEmpty()){
-        return;
-    }
-    QPixmap pix;
-    if(pix.load(path)){
-        pix.save(dirPath+"/example.png");
-        QPixmap prevImg;
-        if(pix.width() > pix.height()){
-            prevImg = pix.scaledToWidth(300,Qt::SmoothTransformation);
-        }else{
-            prevImg = pix.scaledToHeight(300,Qt::SmoothTransformation);
-        }
-        prevImg.save(dirPath+"/prev_example.png");
-
-    }
-    this->accept();
-*/
 }
 
 
@@ -141,6 +125,43 @@ void MapSettings::on_pushButton_3_clicked()
     point_1->setFlags(QGraphicsItem::ItemIsMovable);
     point_2->setFlags(QGraphicsItem::ItemIsMovable);
     pointsLine->setLine(point_1->x(), point_1->y(),point_2->x(),point_2->y());
+    ui->metrsSpinBox->setValue(metrOnePixel* pointsLine->line().length());
+    pointText->setText(QString::number(round(pointsLine->line().length() * metrOnePixel))+" м.");
+    ui->graphicsView_2->setCursor(Qt::SizeAllCursor);
+    point_1->setCursor(Qt::ArrowCursor);
+    point_2->setCursor(Qt::ArrowCursor);
     ui->stackedWidget->setCurrentWidget(ui->page_3);
+}
+
+void MapSettings::updatePointPositonSlot()
+{
+    pointsLine->setLine(point_1->x(), point_1->y(),point_2->x(),point_2->y());
+    pointText->setText(QString::number(round(pointsLine->line().length() * metrOnePixel))+" м.");
+}
+
+
+void MapSettings::on_pushButton_9_clicked()
+{
+
+}
+
+
+void MapSettings::on_pushButton_6_clicked()
+{
+
+    QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +"/maps";
+    QDir dir(dirPath);
+    if(!dir.exists()){
+        if(!dir.mkpath(dirPath)){
+            qDebug() << "Error create dir" << dirPath;
+            return;
+        }
+    }
+    qDebug() << dirPath;
+    QString filename = "map" + QDateTime::currentDateTime().toString("yyyy_mm_dd_hh_mm_ss");
+    originImg->save(dirPath+"/"+filename+"_origin.png");
+    prevImg->save(dirPath+"/"+filename+"_small.png");
+    this->accept();
+
 }
 
