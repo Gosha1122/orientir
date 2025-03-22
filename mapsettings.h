@@ -5,10 +5,14 @@
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
 #include "mapcropborderitem.h"
+#include "linerpoint.h"
+#include <QGraphicsLineItem>
 
 namespace Ui {
 class MapSettings;
 }
+
+class QPixmap;
 
 class MapSettings : public QDialog
 {
@@ -26,12 +30,16 @@ private slots:
 
 private:
     Ui::MapSettings *ui;
-    QString originPath;
-    QString priveusPath;
+    QPixmap* originImg;
+    QPixmap* prevImg;
 
     QGraphicsScene* cropScene;
     MapCropBorderItem* cropItem;
     QGraphicsPixmapItem* pixMapItem;
+
+    LinerPoint* point_1;
+    LinerPoint* point_2;
+    QGraphicsLineItem* pointsLine;
 };
 
 #endif // MAPSETTINGS_H

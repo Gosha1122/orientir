@@ -22,13 +22,26 @@ MapSettings::MapSettings(QWidget *parent)
     ui->graphicsView->setSceneRect(0,0,540, 310);
     ui->graphicsView->setScene(cropScene);
     cropScene->addItem(cropItem);
-    setFixedSize(577,398);
+    setFixedSize(577,428);
     ui->stackedWidget->setCurrentWidget(ui->page_1);
+
+    point_1 = new LinerPoint;
+    point_2 = new LinerPoint;
+    pointsLine = new QGraphicsLineItem;
+    cropScene->addItem(pointsLine);
+    cropScene->addItem(point_1);
+    cropScene->addItem(point_2);
+
+    point_1->hide();
+    point_2->hide();
+    pointsLine->hide();
 }
 
 MapSettings::~MapSettings()
 {
     delete ui;
+    delete originImg;
+    delete prevImg;
 }
 
 void MapSettings::on_addButton_clicked()
@@ -49,9 +62,9 @@ void MapSettings::on_addButton_clicked()
         QMessageBox::warning(this, "Ошибка",error);
         return;
     }
-    QPixmap pix;
+    originImg = new QPixmap;
     QString path = ui->pathEdit->text().trimmed();
-    if(pix.load(path)){
+    if(originImg->load(path)){
         pixMapItem = new QGraphicsPixmapItem(QPixmap(path));
         pixMapItem->setFlags(QGraphicsItem::ItemIsMovable);
         cropScene->addItem(pixMapItem);
@@ -111,16 +124,23 @@ void MapSettings::on_selectButton_clicked()
 
 void MapSettings::on_pushButton_3_clicked()
 {
-    qDebug() << pixMapItem->scenePos();
     QPixmap pix;
-    QString path = ui->pathEdit->text().trimmed();
-    QPixmap prev;
-    if(pix.load(path)){
+    int x = (pixMapItem->x()<0)? abs(pixMapItem->x())+120: 120-pixMapItem->x();
+    int y = (pixMapItem->y()<0)? abs(pixMapItem->y())+50: 50-pixMapItem->y();
+    pix = originImg->copy(x, y, 300,200);
+    prevImg = new QPixmap(pix);
+    ui->graphicsView_2->setScene(cropScene);
+    cropItem->hide();
+    ui->graphicsView_2->setSceneRect(0,0,540, 310);
 
-        int x = (pixMapItem->x()<0)? abs(pixMapItem->x())+120: 120-pixMapItem->x();
-        int y = (pixMapItem->y()<0)? abs(pixMapItem->y())+50: 50-pixMapItem->y();
-        prev = pix.copy(x, y, 300,200);
-        prev.save("C:/Users/Sergey/Desktop/1111.png");
-    }
+    point_1->show();
+    point_2->show();
+    pointsLine->show();
+    point_1->setPos(100,100);
+    point_2->setPos(150,100);
+    point_1->setFlags(QGraphicsItem::ItemIsMovable);
+    point_2->setFlags(QGraphicsItem::ItemIsMovable);
+    pointsLine->setLine(point_1->x(), point_1->y(),point_2->x(),point_2->y());
+    ui->stackedWidget->setCurrentWidget(ui->page_3);
 }
 
