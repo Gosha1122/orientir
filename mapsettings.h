@@ -37,8 +37,8 @@ private slots:
 
 private:
     Ui::MapSettings *ui;
-    QPixmap* originImg;
-    QPixmap* prevImg;
+    QPixmap* originImg = nullptr;
+    QPixmap* prevImg = nullptr;
 
     QGraphicsScene* cropScene;
     MapCropBorderItem* cropItem;

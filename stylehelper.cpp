@@ -124,9 +124,24 @@ QString StyleHelper::getMapStyleDark()
             "border:1px solid #aab;"
             "background:red;"
             "border-radius:3px;"
-            "}" + comboBoxStyle + comboBoxViewStyle;
+            "}"+ comboBoxStyle + comboBoxViewStyle;
 
 }
+
+QString StyleHelper::getMapListStyleDark()
+{
+    return "QWidget#mapListPageTopWidget{"
+           "background:"+darkBgTop+";"
+            "}"
+            "QScrollArea{"
+            "border:none;"
+            "}"
+            "QWidget#scrollAreaWidgetContents{"
+            "background:#5c6770;"
+            "}";
+}
+
+
 
 void StyleHelper::setToolButtonStyleDark(QToolButton* btn, MapIconsType type, bool active){
     QString url;
@@ -145,6 +160,9 @@ void StyleHelper::setToolButtonStyleDark(QToolButton* btn, MapIconsType type, bo
         break;
     case Move:
         url = active? ":/resourses/icons/move-active.svg" : ":/resourses/icons/move.svg";
+        break;
+    case Add:
+        url = active? ":/resourses/icons/green_plus.png" : ":/resourses/icons/gray_plus.png";
         break;
     }
     QString bgColor;
@@ -192,14 +210,18 @@ QString StyleHelper::getEndPathButtonStyle()
 QString StyleHelper::getMapIconButtonStyle()
 {
     return "QFrame{"
-           "background:#ddd;"
-           "border:2px solid #ddd;"
+           "background:#4a575f;"
+           "border:2px solid #4a575f;"
            "}"
            "QFrame::hover{"
            "border-color:rgb(120,150,230);"
            "}"
            "QLabel{"
            "border:none;"
+           "}"
+           "QLabel#headerLabel{"
+           "color:#D3D3D3;"
+           "font-size:16px;"
            "}";
 }
 
@@ -246,5 +268,46 @@ QString StyleHelper::getColorButtonStyle(QString color)
            "QPushButton::disabled{"
             "background:"+disabledColorStr+
            "}";
+}
+
+QString StyleHelper::getMessageBoxStyle()
+{
+    return "QDialog{"
+            "background:"+darkBgTop+";"
+            "}";
+}
+
+QString StyleHelper::getMapSettingsStyle()
+{
+    return "QDialog#MapSettings{"
+           "background:"+darkBgTop+";"
+            "}"
+            "QGraphicsView{"
+            "border:none;"
+            "}"
+            "QLabel{"
+            "color:#a3a3a3;"
+            "font-size:14px;"
+            "}"
+            "QLabel#descriptionLabel{"
+            "color:#D3D3D3;"
+            "font-size:14px;"
+            "}"
+            "QLineEdit{"
+            "background-color: #6a777f;"
+            "border: 1px solid #6a777f;"
+            "border-radius:5px;"
+            "padding: 5px;"
+            "font-size:14px;"
+            "color:#2B3035;"
+            "selection-color: #222;"
+            "selection-background-color: #eee;"
+            "}"
+            "QLineEdit::hover{"
+            "border-color:#7a878f;"
+            "}"
+            "QLineEdit::focus{"
+            "background:#fff;"
+            "}";
 }
 

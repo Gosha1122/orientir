@@ -106,6 +106,7 @@ Widget::Widget(QWidget *parent)
     ui->StartSizeSpinBox->setStyleSheet(StyleHelper::getSpinBoxStyle());
     ui->StartWidthSpinBox->setStyleSheet(StyleHelper::getSpinBoxStyle());
     ui->LineWidthSpinBox->setStyleSheet(StyleHelper::getSpinBoxStyle());
+    ui->mapsListPage->setStyleSheet(StyleHelper::getMapListStyleDark());
 
     connect(ui->KPNumSpinBox, &QSpinBox::valueChanged, this, &Widget::SizeSpinBoxSlot);
     connect(ui->KPSizeSpinBox, &QSpinBox::valueChanged, this, &Widget::SizeSpinBoxSlot);
@@ -115,9 +116,10 @@ Widget::Widget(QWidget *parent)
     connect(ui->LineWidthSpinBox, &QSpinBox::valueChanged, this, &Widget::SizeSpinBoxSlot);
 
     connect(ui->CursorSizeComboBox, &QComboBox::currentTextChanged, this,  &Widget::setCursorSlot);
-    connect(ui->CursorColorComboBox, &QComboBox::currentTextChanged, this, &Widget::setCursorSlot);  
-    connect(ui->addMapButton, &QPushButton::clicked, this, &Widget::addMapButtonSlot);
+    connect(ui->CursorColorComboBox, &QComboBox::currentTextChanged, this, &Widget::setCursorSlot);
+    connect(ui->addNewMapButton, &QToolButton::clicked, this, &Widget::addNewMapButtonSlot);
 
+    StyleHelper::setToolButtonStyleDark(ui->addNewMapButton, StyleHelper::MapIconsType::Add,false);
     connect(mapScene, &MapScene::startRulerModeSignal, this, &Widget::startRulerModeSlot);
 }
 
@@ -338,17 +340,19 @@ void Widget::setCursorSlot(const QString& str)
     }
 }
 
-void Widget::addMapButtonSlot()
+
+
+void Widget::startRulerModeSlot()
+{
+    endPathButton->show();
+}
+
+void Widget::addNewMapButtonSlot()
 {
     MapSettings dlg(this);
     if(dlg.exec()==QDialog::Accepted){
 
     }
-}
-
-void Widget::startRulerModeSlot()
-{
-    endPathButton->show();
 }
 
 void Widget::settingsInit()
@@ -397,4 +401,6 @@ void Widget::setRulerMode()
 {
     mapScene->setCurrentToolType(MapScene::ToolType::Ruler);
 }
+
+
 

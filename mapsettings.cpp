@@ -9,6 +9,9 @@
 #include <QMessageBox>
 #include <QGraphicsPixmapItem>
 #include <QCursor>
+#include "stylehelper.h"
+#include <QScreen>
+#include <QIcon>
 
 MapSettings::MapSettings(QWidget *parent)
     : QDialog(parent)
@@ -47,6 +50,8 @@ MapSettings::MapSettings(QWidget *parent)
     point_1->hide();
     point_2->hide();
     pointsLine->hide();
+
+    this->setStyleSheet(StyleHelper::getMapSettingsStyle());
 }
 
 MapSettings::~MapSettings()
@@ -58,6 +63,7 @@ MapSettings::~MapSettings()
 
 void MapSettings::on_addButton_clicked()
 {
+
     QString error;
     if(ui->nameEdit->text().trimmed().isEmpty()){
         error+= "Поле Название карты не может быть пустым\n";
@@ -71,9 +77,15 @@ void MapSettings::on_addButton_clicked()
         error+= "Не существует изображения карты\n";
     }
     if(!error.isEmpty()){
-        QMessageBox::warning(this, "Ошибка",error);
+        QMessageBox msbox(this);
+        msbox.setWindowTitle("Ошибка");
+        msbox.setText(error);
+        msbox.setStyleSheet(StyleHelper::getMessageBoxStyle());
+        msbox.setIcon(QMessageBox::Warning);
+        msbox.exec();
         return;
     }
+    ui->stepImageLabel->setPixmap(QPixmap(":/resourses/icons/step_2.png"));
     originImg = new QPixmap;
     QString path = ui->pathEdit->text().trimmed();
     if(originImg->load(path)){
@@ -108,6 +120,8 @@ void MapSettings::on_selectButton_clicked()
 
 void MapSettings::on_pushButton_3_clicked()
 {
+    ui->stepImageLabel->setPixmap(QPixmap(":/resourses/icons/step_3.png"));
+    ui->descriptionLabel->setText("Переместите точки, чтобы указать растояние");
     QPixmap pix;
     int x = (pixMapItem->x()<0)? abs(pixMapItem->x())+120: 120-pixMapItem->x();
     int y = (pixMapItem->y()<0)? abs(pixMapItem->y())+50: 50-pixMapItem->y();

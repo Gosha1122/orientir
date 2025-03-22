@@ -54,5 +54,10 @@
         <file>resourses/cursors/rw_point_cursor.png</file>
         <file>resourses/cursors/rw_ruler_cursor.png</file>
         <file>resourses/maps/1.png</file>
+        <file>resourses/icons/gray_plus.png</file>
+        <file>resourses/icons/green_plus.png</file>
+        <file>resourses/icons/step_1.png</file>
+        <file>resourses/icons/step_3.png</file>
+        <file>resourses/icons/step_2.png</file>
     </qresource>
 </RCC>
