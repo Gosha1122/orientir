@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "mapscene.h"
 #include "defines.h"
+#include <QCloseEvent>
 
 
 QT_BEGIN_NAMESPACE
@@ -23,7 +24,8 @@ public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
 
-
+protected:
+    void closeEvent(QCloseEvent *event) override;
 private slots:
     void changCurrentToolSlot();
     void scaleSceneSlot();

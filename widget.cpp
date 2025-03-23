@@ -12,12 +12,94 @@
 #include "mapiconbutton.h"
 #include <QGridLayout>
 #include "mapsettings.h"
-
+#include <QXmlStreamWriter>
+#include <QXmlStreamReader>
+#include <QFile>
+#include <QSettings>
+#include <QStandardPaths>
+#include <QScreen>
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
 {
     ui->setupUi(this);
+
+    QCoreApplication::setOrganizationName("MySoft");
+    QCoreApplication::setOrganizationDomain("mysoft.com");
+    QCoreApplication::setApplicationName("Orientir");
+    QString iniFile = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    qDebug() << iniFile;
+    QSettings settings(iniFile+"/settings.ini",QSettings::IniFormat);
+    int w = settings.value("window/width", 800).toInt();
+    int h = settings.value("window/height", 600).toInt();
+    bool winMax = settings.value("window/max", false).toBool();
+    if(winMax){
+        showMaximized();
+    }else{
+        QRect rect = QApplication::primaryScreen()->geometry();
+        setGeometry(rect.width()/2-w/2, rect.height()/2-h/2, w, h);
+    }
+
+
+
+    QFile output("exmample.xml");
+    output.open(QIODevice::WriteOnly |QIODevice::Text);
+    QXmlStreamWriter stream(&output);
+    stream.setAutoFormatting(true);
+    stream.writeStartDocument();
+    stream.writeStartElement("maps");
+    stream.writeStartElement("map");
+
+    stream.writeTextElement("title", "Первенство...");
+    stream.writeTextElement("origin", "C:/123/1.png");
+    stream.writeTextElement("small", "C:/123/1small.png");
+    stream.writeTextElement("size", "1000");
+    stream.writeTextElement("metrpx", "10");
+    stream.writeTextElement("description", "sjslkdjfl skdfj\n slkdj\n fklsjdfl");
+    stream.writeEndElement(); // map
+
+    stream.writeStartElement("map");
+    stream.writeTextElement("title", "Чемпионат...");
+    stream.writeTextElement("origin", "C:/123/12.png");
+    stream.writeTextElement("small", "C:/123/12small.png");
+    stream.writeTextElement("size", "10000");
+    stream.writeTextElement("metrpx", "20");
+    stream.writeTextElement("description", "sjs33333lkdjfl skdfj\n slkdj\n fklsjdfl");
+    stream.writeEndElement(); // map
+    stream.writeEndElement(); // maps
+    stream.writeEndDocument();
+    output.close();
+
+
+    QFile file("exmample.xml");
+    file.open(QIODevice::ReadOnly |QIODevice::Text);
+    QXmlStreamReader xmlReader;
+    xmlReader.setDevice(&file);
+    xmlReader.readNext();
+    QString map;
+    while(!xmlReader.atEnd())
+    {
+        if(xmlReader.isStartElement())
+        {
+            if(xmlReader.name().toString()=="map"){
+                if(!map.isEmpty()){
+                    qDebug() << map;
+                }
+                map.clear();
+
+            }else if(xmlReader.name().toString() == "title"){
+                map += xmlReader.readElementText();
+            }
+            else if(xmlReader.name().toString() == "size"){
+                map += xmlReader.readElementText();
+            }
+        }
+        xmlReader.readNext();
+    }
+    qDebug() << map;
+    file.close();
+
+
     StyleHelper::setFonts();
     ui->mapPage->setStyleSheet(StyleHelper::getMapStyleDark());
     StyleHelper::setToolButtonStyleDark(ui->backButton, StyleHelper::MapIconsType::Back,false);
@@ -126,6 +208,16 @@ Widget::Widget(QWidget *parent)
 Widget::~Widget()
 {
     delete ui;
+}
+
+void Widget::closeEvent(QCloseEvent *event)
+{
+    QString iniFile = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    qDebug() << iniFile;
+    QSettings settings(iniFile+"/settings.ini",QSettings::IniFormat);
+    settings.setValue("window/max",isMaximized());
+    settings.setValue("window/height", height());
+    settings.setValue("window/width",width());
 }
 
 void Widget::changCurrentToolSlot()

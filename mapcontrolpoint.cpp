@@ -100,7 +100,6 @@ void MapControlPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
         painter->setBrush(penColor);
         painter->drawEllipse(-2, -2, 4, 4);
 
-        this->setOpacity(0.5);
 
     }
 }
